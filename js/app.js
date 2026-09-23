@@ -57,7 +57,6 @@ function aplicarTemaPagina(country) {
 function renderCapa(pagina) {
   var img = document.getElementById("capa-img");
   img.src = pagina.capaUrl || placeholderSVG;
-  img.crossOrigin = "anonymous";
 }
 
 function criarCardFigurinha(fig, countryId, countryNome) {
@@ -69,7 +68,7 @@ function criarCardFigurinha(fig, countryId, countryNome) {
 
   card.innerHTML =
     '<div class="figurinha-foto">' +
-      '<img src="' + (fig.fotoUrl || placeholderSVG) + '" crossorigin="anonymous" alt="Foto do jogador">' +
+      '<img src="' + (fig.fotoUrl || placeholderSVG) + '" alt="Foto do jogador">' +
       '<span class="figurinha-baixar-dica" aria-hidden="true">⬇</span>' +
       '<label class="somente-edicao upload-btn upload-btn-sm">📷<input type="file" accept="image/*" class="input-foto-figurinha" hidden></label>' +
     "</div>" +
