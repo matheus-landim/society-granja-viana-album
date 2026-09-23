@@ -1,0 +1,31 @@
+name: Manter Supabase ativo
+
+# Projetos gratuitos do Supabase são pausados automaticamente depois de
+# ~7 dias sem nenhuma requisição. Este workflow faz uma consulta bem leve
+# de tempos em tempos só para contar como atividade e evitar a pausa.
+# Não precisa de nenhuma senha: usa a mesma "anon key" pública que já
+# está em js/supabase-config.js (ela só tem acesso de leitura, controlado
+# pelas regras de segurança do banco).
+
+on:
+  schedule:
+    - cron: "0 12 */3 * *" # a cada 3 dias, às 12h UTC
+  workflow_dispatch: {} # também dá para rodar manualmente na aba Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fazer uma requisição leve ao Supabase
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Configure as variáveis do repositório SUPABASE_URL e SUPABASE_ANON_KEY (Settings > Secrets and variables > Actions > Variables) para este workflow funcionar."
+            exit 1
+          fi
+          curl -sS --fail \
+            "$SUPABASE_URL/rest/v1/paginas?select=country_id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY"

@@ -83,31 +83,30 @@ function criarCardFigurinha(fig, countryId, countryNome) {
     var file = e.target.files[0];
     if (!file) return;
     var pagina = window.paginaAtual;
-    enviarFotoFigurinha(countryId, pagina.figurinhas, fig.id, file).then(function (atualizadas) {
-      pagina.figurinhas = atualizadas;
+    enviarFotoFigurinha(countryId, fig.id, file).then(function (res) {
+      fig.fotoUrl = res.fotoUrl;
+      fig.fotoPath = res.fotoPath;
       renderGrid(pagina, countryId, countryNome);
     });
   });
 
   card.querySelector(".figurinha-nome").addEventListener("change", function (e) {
-    var pagina = window.paginaAtual;
-    editarCampoFigurinha(countryId, pagina.figurinhas, fig.id, "nome", e.target.value).then(function (atualizadas) {
-      pagina.figurinhas = atualizadas;
-    });
+    fig.nome = e.target.value;
+    editarCampoFigurinha(fig.id, "nome", fig.nome);
   });
 
   card.querySelector(".figurinha-numero").addEventListener("change", function (e) {
-    var pagina = window.paginaAtual;
-    editarCampoFigurinha(countryId, pagina.figurinhas, fig.id, "numero", e.target.value).then(function (atualizadas) {
-      pagina.figurinhas = atualizadas;
-    });
+    fig.numero = e.target.value;
+    editarCampoFigurinha(fig.id, "numero", fig.numero);
   });
 
   card.querySelector(".btn-remover-figurinha").addEventListener("click", function () {
     if (!confirm("Remover esta figurinha?")) return;
     var pagina = window.paginaAtual;
-    removerFigurinha(countryId, pagina.figurinhas, fig.id).then(function (atualizadas) {
-      pagina.figurinhas = atualizadas;
+    removerFigurinha(fig).then(function () {
+      pagina.figurinhas = pagina.figurinhas.filter(function (f) {
+        return f.id !== fig.id;
+      });
       renderGrid(pagina, countryId, countryNome);
     });
   });
@@ -166,8 +165,8 @@ function initEventosPagina() {
 
   document.getElementById("btn-add-figurinha").addEventListener("click", function () {
     var pagina = window.paginaAtual;
-    adicionarFigurinhaVazia(pagina.countryId, pagina.figurinhas).then(function (atualizadas) {
-      pagina.figurinhas = atualizadas;
+    adicionarFigurinhaVazia(pagina.countryId).then(function (nova) {
+      pagina.figurinhas.push(nova);
       renderGrid(pagina, pagina.countryId, getCountry(pagina.countryId).nome);
     });
   });
