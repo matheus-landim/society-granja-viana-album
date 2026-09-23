@@ -90,16 +90,14 @@ Projetos gratuitos do Supabase pausam automaticamente depois de cerca de
 (`.github/workflows/keep-supabase-alive.yml`) que faz uma consulta bem
 leve ao banco a cada 3 dias, só para contar como atividade.
 
-Para ativá-lo:
+Já vem pronto pra funcionar sozinho — o workflow usa os mesmos valores
+públicos de `js/supabase-config.js` direto no arquivo (não precisa
+configurar nenhuma secret). O GitHub já roda no cronograma automaticamente.
+Para testar na hora, vá em **Actions > Manter Supabase ativo > Run workflow**.
 
-1. No GitHub, vá em **Settings > Secrets and variables > Actions >
-   Variables** deste repositório.
-2. Crie duas variáveis (não são secretas, são os mesmos valores públicos
-   que já estão em `js/supabase-config.js`):
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-3. Pronto — o GitHub já roda o workflow sozinho no cronograma. Para testar
-   na hora, vá em **Actions > Manter Supabase ativo > Run workflow**.
+Se você trocar de projeto Supabase no futuro, atualize a URL e a chave
+tanto em `js/supabase-config.js` quanto em
+`.github/workflows/keep-supabase-alive.yml`.
 
 ## Estrutura
 

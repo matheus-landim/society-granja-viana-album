@@ -6,8 +6,8 @@
 //
 // Supabase Dashboard > Project Settings > API
 // ============================================================
-var SUPABASE_URL = "COLE_AQUI_A_URL_DO_SEU_PROJETO"; // ex: https://xxxxxxxx.supabase.co
-var SUPABASE_ANON_KEY = "COLE_AQUI_A_ANON_PUBLIC_KEY";
+var SUPABASE_URL = "https://uggdjpzryotxiogysymi.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable__8ZmBIGiG8jE2kNxfIxIhA_VkSbjS3F";
 
 // Sufixo usado para transformar o "usuário" digitado no login em um
 // e-mail válido para o Supabase Auth (ex: usuário "admin" vira
