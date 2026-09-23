@@ -7,13 +7,17 @@ Japão, México, Portugal, Suécia e Uruguai.
 
 - **Qualquer pessoa** pode abrir o link e folhear o álbum (setas ◀ ▶ ou o
   menu de países no topo).
+- Cada página tem exatamente **11 figurinhas fixas** (os 11 titulares),
+  em estilo Panini: emblema do país, foto do time, faixa dourada com o
+  nome, grade de figurinhas numeradas.
 - **Login único** (usuário/senha fixos, sem tela de cadastro) libera o modo
-  de edição: enviar/trocar fotos, adicionar ou remover figurinhas, editar
-  nome e número do jogador, trocar a foto de capa da página.
-- **Exportar imagens**: qualquer visitante pode salvar uma figurinha
-  individual, a seleção inteira (grade de figurinhas) ou a página inteira
-  (com o tema do país) como PNG. Toda imagem exportada sai com a marca
-  "**Society Granja Viana**" gravada no rodapé.
+  de edição: enviar/trocar a foto de cada jogador, editar nome e número
+  da camisa, trocar a foto de capa da página.
+- **Baixar imagens**: qualquer visitante pode tocar numa figurinha para
+  baixar a foto daquele jogador, ou usar os botões para salvar a seleção
+  inteira (grade) ou a página inteira (com o tema do país) como PNG. Toda
+  imagem exportada sai com a marca "**Society Granja Viana**" gravada no
+  rodapé.
 
 Site estático (HTML/CSS/JS puro, sem build). O armazenamento das fotos e
 dos dados é feito no **Supabase** (Auth + Postgres + Storage), que tem
@@ -37,7 +41,13 @@ mantém o projeto Supabase ativo automaticamente (veja a seção
    - as tabelas `paginas` e `figurinhas`;
    - o bucket de Storage `fotos` (público para leitura);
    - as regras de segurança (RLS): qualquer um pode **ler**, só quem
-     estiver **logado** pode **editar**.
+     estiver **logado** pode **editar**;
+   - as 16 páginas já com as 11 figurinhas em branco de cada uma.
+
+   > Se você já tinha rodado uma versão antiga deste script (sem as 11
+   > figurinhas fixas), rode em vez disso o arquivo
+   > `supabase/migracao-11-jogadores.sql` — ele atualiza o banco existente
+   > para o novo formato.
 
 ## 3. Ativar o login e criar o usuário único
 
@@ -110,7 +120,8 @@ js/auth.js               Login/logout (usuário/senha fixo, sem cadastro)
 js/album.js               Leitura/escrita das figurinhas e fotos no Supabase
 js/export.js               Exportação de imagens (figurinha, seleção, página) com marca d'água
 js/app.js                   Navegação entre países e renderização da página atual
-supabase/schema.sql          Script único: tabelas + bucket + regras de segurança
+supabase/schema.sql                        Script único: tabelas + bucket + regras + as 11 figurinhas de cada país
+supabase/migracao-11-jogadores.sql          Migração para quem já tinha rodado uma versão antiga do schema
 .github/workflows/keep-supabase-alive.yml   Keep-alive automático (passo 7)
 ```
 
@@ -120,6 +131,10 @@ supabase/schema.sql          Script único: tabelas + bucket + regras de seguran
   topo de `js/export.js`.
 - **Adicionar/remover um país**: edite o array `COUNTRIES` em
   `js/countries.js` (cada item tem `id`, `nome`, `bandeira` e as 3 `cores`
-  usadas no degradê da página).
+  usadas nos detalhes da página) e ajuste a lista de países no
+  `supabase/schema.sql`.
+- **Mudar de 11 para outro número de jogadores**: ajuste o
+  `generate_series(1, 11)` em `supabase/schema.sql` (ou na migração) para
+  o número desejado.
 - **Trocar o login**: edite/crie o usuário em Supabase > Authentication >
   Users. Não existe tela de cadastro no site de propósito.

@@ -34,26 +34,38 @@
   <button type="button" id="next-country" class="seta seta-next" aria-label="Próximo país">›</button>
 
   <section class="pagina-header">
-    <p class="pagina-flag" id="pagina-bandeira">🏳️</p>
-    <h1 id="pagina-titulo">—</h1>
+    <div class="header-emblemas">
+      <div class="emblema-pais">
+        <div class="emblema-pais-circulo" id="pagina-bandeira">🏳️</div>
+        <p class="emblema-legenda">Seleção</p>
+      </div>
 
-    <div class="capa-wrap pixel-frame">
-      <img id="capa-img" alt="Foto da equipe" class="capa-img">
-      <label class="somente-edicao upload-btn">
-        Trocar foto de capa
-        <input type="file" id="capa-input" accept="image/*" hidden>
-      </label>
+      <div class="capa-wrap pixel-frame">
+        <img id="capa-img" alt="Foto da equipe" class="capa-img">
+        <label class="somente-edicao upload-btn">
+          Trocar foto
+          <input type="file" id="capa-input" accept="image/*" hidden>
+        </label>
+      </div>
+
+      <div class="emblema-campeonato">
+        <div class="emblema-campeonato-circulo">
+          <span class="emblema-campeonato-icone">⚽</span>
+          <span class="emblema-campeonato-texto">CAMPEONATO<br>INTERNO</span>
+        </div>
+      </div>
     </div>
 
+    <h1 class="pagina-titulo-faixa"><span id="pagina-titulo">—</span></h1>
+
     <div class="pagina-acoes">
-      <button type="button" id="btn-add-figurinha" class="btn btn-primary somente-edicao">+ Adicionar figurinha</button>
       <button type="button" id="btn-exportar-selecao" class="btn btn-ghost">⬇ Salvar seleção</button>
       <button type="button" id="btn-exportar-pagina" class="btn btn-ghost">⬇ Salvar página inteira</button>
     </div>
   </section>
 
+  <p class="grid-dica">Toque numa figurinha para baixar a foto do jogador.</p>
   <section class="grid-figurinhas" id="grid-figurinhas" aria-label="Figurinhas dos jogadores"></section>
-  <p id="grid-vazio" class="grid-vazio" hidden>Nenhuma figurinha ainda. Entre com o login para adicionar os jogadores desta seleção.</p>
 </main>
 
 <dialog id="login-modal" class="login-modal">

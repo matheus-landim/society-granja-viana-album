@@ -68,16 +68,18 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   var logado = !!currentUser;
 
   card.innerHTML =
+    '<span class="figurinha-numero-chip">' + escapeAttr(fig.numero) + "</span>" +
     '<div class="figurinha-foto">' +
       '<img src="' + (fig.fotoUrl || placeholderSVG) + '" crossorigin="anonymous" alt="Foto do jogador">' +
+      '<span class="figurinha-baixar-dica" aria-hidden="true">⬇</span>' +
       '<label class="somente-edicao upload-btn upload-btn-sm">📷<input type="file" accept="image/*" class="input-foto-figurinha" hidden></label>' +
     "</div>" +
-    '<input class="figurinha-nome" placeholder="Nome do jogador" value="' + escapeAttr(fig.nome) + '" ' + (logado ? "" : "readonly") + ">" +
-    '<input class="figurinha-numero" placeholder="Nº" maxlength="3" value="' + escapeAttr(fig.numero) + '" ' + (logado ? "" : "readonly") + ">" +
-    '<div class="figurinha-acoes">' +
-      '<button type="button" class="btn-exportar-figurinha" title="Salvar esta figurinha">⬇ Salvar figurinha</button>' +
-      '<button type="button" class="somente-edicao btn-remover-figurinha" title="Remover figurinha">🗑</button>' +
-    "</div>";
+    '<div class="figurinha-nome-bar">' +
+      '<input class="figurinha-nome" placeholder="Nome do jogador" value="' + escapeAttr(fig.nome) + '" ' + (logado ? "" : "readonly") + ">" +
+    "</div>" +
+    (logado
+      ? '<input class="figurinha-numero-input somente-edicao" placeholder="Nº da camisa" maxlength="3" value="' + escapeAttr(fig.numero) + '">'
+      : "");
 
   card.querySelector(".input-foto-figurinha").addEventListener("change", function (e) {
     var file = e.target.files[0];
@@ -95,23 +97,18 @@ function criarCardFigurinha(fig, countryId, countryNome) {
     editarCampoFigurinha(fig.id, "nome", fig.nome);
   });
 
-  card.querySelector(".figurinha-numero").addEventListener("change", function (e) {
-    fig.numero = e.target.value;
-    editarCampoFigurinha(fig.id, "numero", fig.numero);
-  });
-
-  card.querySelector(".btn-remover-figurinha").addEventListener("click", function () {
-    if (!confirm("Remover esta figurinha?")) return;
-    var pagina = window.paginaAtual;
-    removerFigurinha(fig).then(function () {
-      pagina.figurinhas = pagina.figurinhas.filter(function (f) {
-        return f.id !== fig.id;
-      });
-      renderGrid(pagina, countryId, countryNome);
+  var numeroInput = card.querySelector(".figurinha-numero-input");
+  if (numeroInput) {
+    numeroInput.addEventListener("change", function (e) {
+      fig.numero = e.target.value;
+      editarCampoFigurinha(fig.id, "numero", fig.numero);
+      card.querySelector(".figurinha-numero-chip").textContent = fig.numero;
     });
-  });
+  }
 
-  card.querySelector(".btn-exportar-figurinha").addEventListener("click", function () {
+  // Clique na figurinha (fora dos campos de edição) baixa a foto do jogador.
+  card.addEventListener("click", function (e) {
+    if (e.target.closest(".somente-edicao") || e.target.tagName === "INPUT") return;
     var nomeAtual = card.querySelector(".figurinha-nome").value || "jogador";
     exportarFigurinha(card, countryNome, nomeAtual);
   });
@@ -129,9 +126,6 @@ function renderGrid(pagina, countryId, countryNome) {
   pagina.figurinhas.forEach(function (fig) {
     grid.appendChild(criarCardFigurinha(fig, countryId, countryNome));
   });
-
-  var vazio = document.getElementById("grid-vazio");
-  vazio.hidden = pagina.figurinhas.length !== 0;
 }
 
 function renderPagina(pagina) {
@@ -161,14 +155,6 @@ function initEventosPagina() {
     var idx = paisAtualIndex();
     var novo = (idx + 1) % COUNTRIES.length;
     irParaPais(COUNTRIES[novo].id);
-  });
-
-  document.getElementById("btn-add-figurinha").addEventListener("click", function () {
-    var pagina = window.paginaAtual;
-    adicionarFigurinhaVazia(pagina.countryId).then(function (nova) {
-      pagina.figurinhas.push(nova);
-      renderGrid(pagina, pagina.countryId, getCountry(pagina.countryId).nome);
-    });
   });
 
   document.getElementById("capa-input").addEventListener("change", function (e) {
