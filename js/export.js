@@ -1,43 +1,175 @@
 // Exportação de imagens (figurinha individual / seleção / página inteira)
-// sempre com a marca d'água "Society Granja Viana" gravada na imagem final.
+// no formato de card para Instagram: logo da escola + foto + legenda + @handle.
 
-var MARCA_DAGUA = "Society Granja Viana";
+var LOGO_URL = "assets/logo-gremio-cotia.png";
+var INSTA_LEGENDA = "Eu participei do Campeonato Interno 2026";
+var INSTA_HANDLE = "@gremio_cotia";
 
-function desenharMarcaDagua(canvas) {
-  var ctx = canvas.getContext("2d");
-  var w = canvas.width;
-  var h = canvas.height;
-  var faixaAltura = Math.max(28, Math.round(h * 0.055));
+var logoPronto = (function () {
+  var img = new Image();
+  img.src = LOGO_URL;
+  if (img.decode) {
+    return img.decode().then(function () { return img; }).catch(function () { return null; });
+  }
+  return new Promise(function (resolve) {
+    img.onload = function () { resolve(img); };
+    img.onerror = function () { resolve(null); };
+  });
+})();
 
-  ctx.save();
-  ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
-  ctx.fillRect(0, h - faixaAltura, w, faixaAltura);
+// Mostra o modal de confirmação e resolve true/false conforme o botão clicado.
+function confirmarDownload() {
+  return new Promise(function (resolve) {
+    var modal = document.getElementById("confirmar-download-modal");
+    if (!modal) { resolve(true); return; }
 
-  var fontSize = Math.max(14, Math.round(faixaAltura * 0.5));
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "700 " + fontSize + "px 'Poppins', 'Segoe UI', sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(MARCA_DAGUA, w / 2, h - faixaAltura / 2);
-  ctx.restore();
+    var btnSim = document.getElementById("btn-confirmar-download");
+    var btnNao = document.getElementById("btn-cancelar-download");
+    var resolvido = false;
 
-  return canvas;
+    function finalizar(valor) {
+      if (resolvido) return;
+      resolvido = true;
+      btnSim.removeEventListener("click", aoConfirmar);
+      btnNao.removeEventListener("click", aoCancelar);
+      modal.removeEventListener("close", aoFechar);
+      modal.close();
+      resolve(valor);
+    }
+    function aoConfirmar() { finalizar(true); }
+    function aoCancelar() { finalizar(false); }
+    function aoFechar() { finalizar(false); }
+
+    btnSim.addEventListener("click", aoConfirmar);
+    btnNao.addEventListener("click", aoCancelar);
+    modal.addEventListener("close", aoFechar);
+    modal.showModal();
+  });
 }
 
-function baixarCanvas(canvas, nomeArquivo) {
-  desenharMarcaDagua(canvas);
-  canvas.toBlob(function (blob) {
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = nomeArquivo;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function () {
-      URL.revokeObjectURL(url);
-    }, 2000);
-  }, "image/png", 0.95);
+function desenharTextoCentralizado(ctx, texto, x, y, maxLargura, fonte, cor) {
+  ctx.font = fonte;
+  ctx.fillStyle = cor;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  if (ctx.measureText(texto).width <= maxLargura) {
+    ctx.fillText(texto, x, y);
+    return;
+  }
+
+  var palavras = texto.split(" ");
+  var linha1 = "";
+  var linha2 = "";
+  for (var i = 0; i < palavras.length; i++) {
+    var tentativa = (linha1 ? linha1 + " " : "") + palavras[i];
+    if (!linha1 || ctx.measureText(tentativa).width <= maxLargura) {
+      linha1 = tentativa;
+    } else {
+      linha2 = palavras.slice(i).join(" ");
+      break;
+    }
+  }
+  if (linha2) {
+    ctx.fillText(linha1, x, y - 24);
+    ctx.fillText(linha2, x, y + 24);
+  } else {
+    ctx.fillText(linha1, x, y);
+  }
+}
+
+// Monta o card final no formato Instagram (1080x1080): logo da escola no
+// topo, a imagem capturada (figurinha/seleção/página) no meio, e a legenda
+// + @handle no rodapé.
+function montarCardInstagram(canvasOriginal) {
+  return logoPronto.then(function (logoImg) {
+    var TAM = 1080;
+    var out = document.createElement("canvas");
+    out.width = TAM;
+    out.height = TAM;
+    var ctx = out.getContext("2d");
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, TAM, TAM);
+
+    ctx.strokeStyle = "#0d1b2a";
+    ctx.lineWidth = 10;
+    ctx.strokeRect(20, 20, TAM - 40, TAM - 40);
+
+    var topo = 60;
+
+    if (logoImg) {
+      var logoLado = 210;
+      ctx.drawImage(logoImg, (TAM - logoLado) / 2, topo, logoLado, logoLado);
+      topo += logoLado + 26;
+    } else {
+      topo += 20;
+    }
+
+    ctx.strokeStyle = "#1e8bc3";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(TAM * 0.28, topo);
+    ctx.lineTo(TAM * 0.72, topo);
+    ctx.stroke();
+    topo += 28;
+
+    var baixoReservado = 190;
+    var areaX = 70;
+    var areaLargura = TAM - areaX * 2;
+    var areaY = topo;
+    var areaAltura = TAM - baixoReservado - areaY;
+
+    var escala = Math.min(areaLargura / canvasOriginal.width, areaAltura / canvasOriginal.height);
+    var wDesenho = canvasOriginal.width * escala;
+    var hDesenho = canvasOriginal.height * escala;
+    var xDesenho = areaX + (areaLargura - wDesenho) / 2;
+    var yDesenho = areaY + (areaAltura - hDesenho) / 2;
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.25)";
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 6;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(xDesenho - 6, yDesenho - 6, wDesenho + 12, hDesenho + 12);
+    ctx.restore();
+
+    ctx.strokeStyle = "#0d1b2a";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(xDesenho - 6, yDesenho - 6, wDesenho + 12, hDesenho + 12);
+    ctx.drawImage(canvasOriginal, xDesenho, yDesenho, wDesenho, hDesenho);
+
+    var legendaY = TAM - baixoReservado + 58;
+    desenharTextoCentralizado(
+      ctx, INSTA_LEGENDA, TAM / 2, legendaY, TAM - 140,
+      "700 40px 'Poppins', 'Segoe UI', sans-serif", "#0d1b2a"
+    );
+
+    ctx.font = "600 32px 'Poppins', 'Segoe UI', sans-serif";
+    ctx.fillStyle = "#1e8bc3";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(INSTA_HANDLE, TAM / 2, TAM - 58);
+
+    return out;
+  });
+}
+
+function baixarCanvas(canvasOriginal, nomeArquivo) {
+  montarCardInstagram(canvasOriginal).then(function (canvasFinal) {
+    canvasFinal.toBlob(function (blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = nomeArquivo;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 2000);
+    }, "image/png", 0.95);
+  });
 }
 
 function capturarElemento(el) {
@@ -63,21 +195,30 @@ function slugify(texto) {
 
 // Exporta apenas o cartão de uma figurinha (foto + nome + número).
 function exportarFigurinha(cardEl, countryNome, nomeJogador) {
-  capturarElemento(cardEl).then(function (canvas) {
-    baixarCanvas(canvas, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png");
+  confirmarDownload().then(function (ok) {
+    if (!ok) return;
+    capturarElemento(cardEl).then(function (canvas) {
+      baixarCanvas(canvas, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png");
+    });
   });
 }
 
 // Exporta a grade inteira de figurinhas (a "seleção") da página atual.
 function exportarSelecao(gridEl, countryNome) {
-  capturarElemento(gridEl).then(function (canvas) {
-    baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png");
+  confirmarDownload().then(function (ok) {
+    if (!ok) return;
+    capturarElemento(gridEl).then(function (canvas) {
+      baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png");
+    });
   });
 }
 
 // Exporta a página inteira (tema do país + toda a grade de figurinhas).
 function exportarPagina(pageEl, countryNome) {
-  capturarElemento(pageEl).then(function (canvas) {
-    baixarCanvas(canvas, "pagina-" + slugify(countryNome) + ".png");
+  confirmarDownload().then(function (ok) {
+    if (!ok) return;
+    capturarElemento(pageEl).then(function (canvas) {
+      baixarCanvas(canvas, "pagina-" + slugify(countryNome) + ".png");
+    });
   });
 }
