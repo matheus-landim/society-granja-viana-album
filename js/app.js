@@ -68,18 +68,18 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   var logado = !!currentUser;
 
   card.innerHTML =
-    '<span class="figurinha-numero-chip">' + escapeAttr(fig.numero) + "</span>" +
     '<div class="figurinha-foto">' +
       '<img src="' + (fig.fotoUrl || placeholderSVG) + '" crossorigin="anonymous" alt="Foto do jogador">' +
       '<span class="figurinha-baixar-dica" aria-hidden="true">⬇</span>' +
       '<label class="somente-edicao upload-btn upload-btn-sm">📷<input type="file" accept="image/*" class="input-foto-figurinha" hidden></label>' +
     "</div>" +
-    '<div class="figurinha-nome-bar">' +
+    '<div class="figurinha-info">' +
+      '<span class="figurinha-numero-tag">Nº ' + escapeAttr(fig.numero) + "</span>" +
       '<input class="figurinha-nome" placeholder="Nome do jogador" value="' + escapeAttr(fig.nome) + '" ' + (logado ? "" : "readonly") + ">" +
-    "</div>" +
-    (logado
-      ? '<input class="figurinha-numero-input somente-edicao" placeholder="Nº da camisa" maxlength="3" value="' + escapeAttr(fig.numero) + '">'
-      : "");
+      (logado
+        ? '<input class="figurinha-numero-input somente-edicao" placeholder="Nº da camisa" maxlength="3" value="' + escapeAttr(fig.numero) + '">'
+        : "") +
+    "</div>";
 
   card.querySelector(".input-foto-figurinha").addEventListener("change", function (e) {
     var file = e.target.files[0];
@@ -102,7 +102,7 @@ function criarCardFigurinha(fig, countryId, countryNome) {
     numeroInput.addEventListener("change", function (e) {
       fig.numero = e.target.value;
       editarCampoFigurinha(fig.id, "numero", fig.numero);
-      card.querySelector(".figurinha-numero-chip").textContent = fig.numero;
+      card.querySelector(".figurinha-numero-tag").textContent = "Nº " + fig.numero;
     });
   }
 
