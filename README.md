@@ -17,11 +17,12 @@ Japão, México, Portugal, Suécia e Uruguai.
   (card "+ Adicionar jogador" no fim da grade) quando o time tiver mais
   de 11 jogadores.
 - **Baixar imagens**: qualquer visitante pode tocar numa figurinha para
-  baixar a foto daquele jogador, ou usar o botão para salvar a seleção
-  inteira (grade) como PNG. Antes de baixar, aparece um aviso de
-  confirmação. A imagem exportada sai como um card estilo Instagram: logo
-  da Escola de Futebol Grêmio Cotia + `@gremio_cotia` no topo e a foto
-  preenchendo o resto do quadro — tudo gravado na própria imagem.
+  baixar a foto daquele aluno (não tem opção de baixar a seleção
+  inteira). Antes de baixar, aparece um aviso de confirmação. A imagem
+  exportada sai como um card estilo Instagram: logo da Escola de Futebol
+  Grêmio Cotia + `@gremio_cotia` no topo e a foto inteira (nunca cortada,
+  nem o rosto) preenchendo o resto do quadro — tudo gravado na própria
+  imagem.
 - **Patrocinadores**: uma faixa de logos aparece no fim de cada página
   (a mesma lista em todas as seleções). Fica escondida quando não há
   nenhum patrocinador cadastrado.

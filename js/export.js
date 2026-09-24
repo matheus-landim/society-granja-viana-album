@@ -1,6 +1,5 @@
-// Exportação de imagens (figurinha individual / seleção completa) no
-// formato de card para Instagram: logo da escola + @handle no topo, foto
-// preenchendo o resto do quadro.
+// Exportação da foto de cada aluno no formato de card para Instagram:
+// logo da escola + @handle no topo, foto preenchendo o resto do quadro.
 
 var LOGO_URL = "assets/logo-gremio-cotia.png";
 var INSTA_HANDLE = "@gremio_cotia";
@@ -64,7 +63,7 @@ function desenharImagemCover(ctx, img, x, y, w, h) {
 }
 
 // Desenha uma imagem "contain" (cabe inteira dentro do retângulo, sem
-// cortar nada — usado pra seleção/página, onde tem várias figurinhas juntas).
+// cortar nada — garante que nenhum aluno fique sem cabeça no recorte).
 function desenharImagemContain(ctx, img, x, y, w, h) {
   var escala = Math.min(w / img.width, h / img.height);
   var wDesenho = img.width * escala;
@@ -175,18 +174,6 @@ function baixarCanvas(imagemOuCanvas, nomeArquivo) {
   });
 }
 
-function capturarElemento(el) {
-  document.body.classList.add("capturando");
-  return html2canvas(el, {
-    useCORS: true,
-    allowTaint: false,
-    backgroundColor: "#ffffff",
-    scale: Math.min(2, window.devicePixelRatio || 1.5)
-  }).finally(function () {
-    document.body.classList.remove("capturando");
-  });
-}
-
 function slugify(texto) {
   return String(texto || "")
     .toLowerCase()
@@ -204,16 +191,6 @@ function exportarFigurinha(fotoUrl, countryNome, nomeJogador) {
     if (!ok) return;
     carregarImagem(fotoUrl).then(function (img) {
       baixarCanvas(img, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png");
-    });
-  });
-}
-
-// Exporta a grade inteira de figurinhas (a "seleção") da página atual.
-function exportarSelecao(gridEl, countryNome) {
-  confirmarDownload().then(function (ok) {
-    if (!ok) return;
-    capturarElemento(gridEl).then(function (canvas) {
-      baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png");
     });
   });
 }
