@@ -219,14 +219,32 @@ function esconderTelaCarregamento() {
   }, espera);
 }
 
+// Se a pessoa trocar de país várias vezes rápido, cada clique dispara um
+// carregamento novo. Esse número marca qual é o mais recente, pra
+// ignorar respostas antigas que cheguem fora de ordem — e o try/finally
+// garante que a página nunca fique travada em "carregando" pra sempre,
+// mesmo se algum carregamento falhar.
+var numeroDoCarregamento = 0;
+
 function carregarEExibir(countryId) {
+  var esteCarregamento = ++numeroDoCarregamento;
   document.getElementById("pagina").classList.add("carregando");
-  carregarPagina(countryId).then(function (dados) {
-    window.paginaAtual = Object.assign({ countryId: countryId }, dados);
-    renderPagina(window.paginaAtual);
-    document.getElementById("pagina").classList.remove("carregando");
-    esconderTelaCarregamento();
-  });
+
+  carregarPagina(countryId)
+    .then(function (dados) {
+      if (esteCarregamento !== numeroDoCarregamento) return; // já tem um mais novo em andamento
+      window.paginaAtual = Object.assign({ countryId: countryId }, dados);
+      renderPagina(window.paginaAtual);
+    })
+    .catch(function (erro) {
+      console.error("Não consegui carregar a página de " + countryId + ":", erro);
+    })
+    .finally(function () {
+      if (esteCarregamento === numeroDoCarregamento) {
+        document.getElementById("pagina").classList.remove("carregando");
+      }
+      esconderTelaCarregamento();
+    });
 }
 
 function initEventosPagina() {
