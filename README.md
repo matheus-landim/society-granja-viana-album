@@ -25,9 +25,10 @@ Japão, México, Portugal, Suécia e Uruguai.
   Grêmio Cotia + `@gremio_cotia` no topo e a foto inteira (nunca cortada,
   nem o rosto) preenchendo o resto do quadro — tudo gravado na própria
   imagem.
-- **Patrocinadores**: uma faixa de logos aparece no fim de cada página
-  (a mesma lista em todas as seleções). Fica escondida quando não há
-  nenhum patrocinador cadastrado.
+- **Patrocinadores**: cada seleção tem o seu próprio patrocinador (como
+  na tradição do campeonato: Portugal/Fortland, Croácia/J Design,
+  Bélgica/Amplios, Brasil/Society Granja Viana, etc), mostrado no fim da
+  página. Fica escondido nas seleções sem patrocinador cadastrado.
 
 Site estático (HTML/CSS/JS puro, sem build). O armazenamento das fotos e
 dos dados é feito no **Supabase** (Auth + Postgres + Storage), que tem
@@ -61,7 +62,9 @@ mantém o projeto Supabase ativo automaticamente (veja a seção
 
 3. Pra ativar o espaço dos patrocinadores, rode também o arquivo
    `supabase/patrocinadores.sql` (cria a tabela `patrocinadores`, com as
-   mesmas regras de segurança: leitura pública, escrita só logado).
+   mesmas regras de segurança: leitura pública, escrita só logado) e, em
+   seguida, `supabase/patrocinador-por-pais.sql` (adiciona a coluna
+   `country_id`, que faz cada seleção ter o seu próprio patrocinador).
 
 ## 3. Ativar o login e criar o usuário único
 
@@ -138,6 +141,7 @@ js/app.js                   Navegação entre países e renderização da págin
 supabase/schema.sql                        Script único: tabelas + bucket + regras + as 11 figurinhas de cada país
 supabase/migracao-11-jogadores.sql          Migração para quem já tinha rodado uma versão antiga do schema
 supabase/patrocinadores.sql                 Cria a tabela de patrocinadores (passo 2.3)
+supabase/patrocinador-por-pais.sql          Um patrocinador por seleção, em vez de lista genérica (passo 2.3)
 .github/workflows/keep-supabase-alive.yml   Keep-alive automático (passo 7)
 ```
 
@@ -155,8 +159,8 @@ supabase/patrocinadores.sql                 Cria a tabela de patrocinadores (pas
   o número desejado.
 - **Trocar o login**: edite/crie o usuário em Supabase > Authentication >
   Users. Não existe tela de cadastro no site de propósito.
-- **Adicionar/editar patrocinadores**: não tem tela de edição no site —
-  edite direto a tabela `patrocinadores` em Supabase > Table Editor
-  (colunas `nome`, `link`, `logo_url` e `ordem`). Pra importar uma lista
-  em CSV de uma vez, use **Table Editor > Insert > Import data from CSV**
-  (o CSV precisa ter colunas com esses mesmos nomes).
+- **Adicionar/editar o patrocinador de uma seleção**: não tem tela de
+  edição no site — edite direto a tabela `patrocinadores` em Supabase >
+  Table Editor (colunas `country_id` — o id do país, ex: `portugal` —,
+  `nome`, `link`, `logo_url` e `ordem`). Cada `country_id` só pode
+  aparecer uma vez (um patrocinador por seleção).

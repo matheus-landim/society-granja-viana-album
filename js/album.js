@@ -14,17 +14,29 @@ function mapFigurinha(row) {
   };
 }
 
+function mapPatrocinador(row) {
+  if (!row) return null;
+  return {
+    nome: row.nome || "",
+    link: row.link || null,
+    logoUrl: row.logo_url || null
+  };
+}
+
 function carregarPagina(countryId) {
   return Promise.all([
     sbClient.from("paginas").select("capa_url,capa_path").eq("country_id", countryId).maybeSingle(),
-    sbClient.from("figurinhas").select("*").eq("country_id", countryId).order("ordem", { ascending: true })
+    sbClient.from("figurinhas").select("*").eq("country_id", countryId).order("ordem", { ascending: true }),
+    sbClient.from("patrocinadores").select("*").eq("country_id", countryId).maybeSingle()
   ]).then(function (resultados) {
     var paginaRes = resultados[0];
     var figurinhasRes = resultados[1];
+    var patrocinadorRes = resultados[2];
     return {
       capaUrl: (paginaRes.data && paginaRes.data.capa_url) || null,
       capaPath: (paginaRes.data && paginaRes.data.capa_path) || null,
-      figurinhas: (figurinhasRes.data || []).map(mapFigurinha)
+      figurinhas: (figurinhasRes.data || []).map(mapFigurinha),
+      patrocinador: mapPatrocinador(patrocinadorRes.data)
     };
   });
 }
@@ -66,26 +78,6 @@ function adicionarFigurinha(countryId, ordem) {
     .then(function (res) {
       if (res.error) throw res.error;
       return mapFigurinha(res.data);
-    });
-}
-
-function mapPatrocinador(row) {
-  return {
-    id: row.id,
-    nome: row.nome || "",
-    link: row.link || null,
-    logoUrl: row.logo_url || null,
-    ordem: row.ordem
-  };
-}
-
-function carregarPatrocinadores() {
-  return sbClient
-    .from("patrocinadores")
-    .select("*")
-    .order("ordem", { ascending: true })
-    .then(function (res) {
-      return (res.data || []).map(mapPatrocinador);
     });
 }
 
