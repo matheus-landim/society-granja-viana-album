@@ -5,10 +5,10 @@ temática para cada país/seleção: Alemanha, Argentina, Bélgica, Brasil,
 Colômbia, Croácia, Espanha, Estados Unidos, França, Holanda, Inglaterra,
 Japão, México, Portugal, Suécia e Uruguai.
 
-- **Qualquer pessoa** pode abrir o link e folhear o álbum (setas ◀ ▶ ou o
-  seletor de país no topo, que abre uma lista com todas as seleções).
-  Uma tela de carregamento com o logo aparece enquanto os dados do
-  Supabase não chegam.
+- **Qualquer pessoa** pode abrir o link e folhear o álbum (setas ◀ ▶ ou
+  tocando na bandeira do país desejado, todas visíveis logo abaixo do
+  cabeçalho). Uma tela de carregamento com o logo aparece enquanto os
+  dados do Supabase não chegam.
 - Cada página mostra só as figurinhas que já têm jogador (nome ou foto);
   slots vazios ficam escondidos para quem só está visitando, em estilo
   Panini: emblema do país, foto do time, faixa dourada com o nome, grade

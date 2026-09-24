@@ -13,28 +13,20 @@ var placeholderSVG =
   );
 
 function montarSeletorPaises() {
-  var lista = document.getElementById("paises-lista");
-  var modal = document.getElementById("paises-modal");
-  lista.innerHTML = "";
+  var nav = document.getElementById("country-flags");
+  nav.innerHTML = "";
 
   COUNTRIES.forEach(function (c) {
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "pais-item";
+    btn.className = "country-flag-btn";
     btn.dataset.id = c.id;
-    btn.innerHTML = '<img class="pais-item-bandeira" src="' + bandeiraUrl(c) + '" alt="">' + c.nome;
+    btn.title = c.nome;
+    btn.innerHTML = '<img src="' + bandeiraUrl(c) + '" alt="' + c.nome + '">';
     btn.addEventListener("click", function () {
-      modal.close();
       irParaPais(c.id);
     });
-    lista.appendChild(btn);
-  });
-
-  document.getElementById("btn-selecionar-pais").addEventListener("click", function () {
-    modal.showModal();
-  });
-  document.getElementById("btn-fechar-paises").addEventListener("click", function () {
-    modal.close();
+    nav.appendChild(btn);
   });
 }
 
@@ -62,10 +54,7 @@ function aplicarTemaPagina(country) {
   document.getElementById("pagina-titulo").textContent = country.nome;
   document.title = country.nome + " — Álbum Society Granja Viana";
 
-  document.getElementById("pais-seletor-bandeira").src = bandeiraUrl(country);
-  document.getElementById("pais-seletor-nome").textContent = country.nome;
-
-  document.querySelectorAll(".pais-item").forEach(function (btn) {
+  document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
     btn.classList.toggle("ativo", btn.dataset.id === country.id);
   });
 }
@@ -215,13 +204,19 @@ function renderPagina(pagina) {
   renderGrid(pagina, pagina.countryId, country.nome);
 }
 
+var inicioCarregamento = Date.now();
+var TEMPO_MINIMO_LOADING = 700; // ms — pra dar tempo da pessoa perceber a tela
+
 function esconderTelaCarregamento() {
   var overlay = document.getElementById("loading-overlay");
   if (!overlay) return;
-  overlay.classList.add("loading-overlay-escondido");
+  var espera = Math.max(0, TEMPO_MINIMO_LOADING - (Date.now() - inicioCarregamento));
   setTimeout(function () {
-    overlay.hidden = true;
-  }, 300);
+    overlay.classList.add("loading-overlay-escondido");
+    setTimeout(function () {
+      overlay.hidden = true;
+    }, 300);
+  }, espera);
 }
 
 function carregarEExibir(countryId) {
