@@ -12,22 +12,42 @@
 </head>
 <body>
 
+<div id="loading-overlay" class="loading-overlay">
+  <img src="assets/logo-gremio-cotia.png" alt="Escola de Futebol Grêmio Cotia" class="loading-logo">
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <p>Carregando álbum...</p>
+</div>
+
 <header class="topbar">
   <div class="brand">
-    <span class="brand-badge">⚽</span>
+    <img class="brand-badge" src="assets/logo-gremio-cotia.png" alt="Escola de Futebol Grêmio Cotia">
     <div>
       <strong>Society Granja Viana</strong>
       <span>Álbum do Campeonato Interno</span>
     </div>
   </div>
 
-  <nav class="country-nav" id="country-nav" aria-label="Selecionar país"></nav>
+  <button type="button" id="btn-selecionar-pais" class="pais-seletor" aria-haspopup="dialog">
+    <img class="pais-seletor-bandeira" id="pais-seletor-bandeira" alt="">
+    <span id="pais-seletor-nome">Selecionar país</span>
+    <span class="pais-seletor-seta" aria-hidden="true">▾</span>
+  </button>
 
   <div class="auth-area">
     <button id="btn-login" type="button" class="btn btn-outline">Entrar</button>
     <button id="btn-logout" type="button" class="btn btn-outline" hidden>Sair</button>
   </div>
 </header>
+
+<dialog id="paises-modal" class="login-modal paises-modal">
+  <div class="login-form">
+    <h2>Selecionar país</h2>
+    <div class="paises-lista" id="paises-lista"></div>
+    <div class="login-form-acoes">
+      <button type="button" id="btn-fechar-paises" class="btn btn-ghost">Fechar</button>
+    </div>
+  </div>
+</dialog>
 
 <main id="pagina" class="pagina">
   <button type="button" id="prev-country" class="seta seta-prev" aria-label="País anterior">‹</button>
