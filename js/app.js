@@ -46,6 +46,7 @@ function aplicarTemaPagina(country) {
   pagina.style.setProperty("--c2", country.cores[1]);
   pagina.style.setProperty("--c3", country.cores[2]);
   document.getElementById("pagina-bandeira").textContent = country.bandeira;
+  document.getElementById("hero-bandeira-emoji").textContent = country.bandeira;
   document.getElementById("pagina-titulo").textContent = country.nome;
   document.title = country.nome + " — Álbum Society Granja Viana";
 
