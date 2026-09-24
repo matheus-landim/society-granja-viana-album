@@ -69,6 +69,26 @@ function adicionarFigurinha(countryId, ordem) {
     });
 }
 
+function mapPatrocinador(row) {
+  return {
+    id: row.id,
+    nome: row.nome || "",
+    link: row.link || null,
+    logoUrl: row.logo_url || null,
+    ordem: row.ordem
+  };
+}
+
+function carregarPatrocinadores() {
+  return sbClient
+    .from("patrocinadores")
+    .select("*")
+    .order("ordem", { ascending: true })
+    .then(function (res) {
+      return (res.data || []).map(mapPatrocinador);
+    });
+}
+
 function enviarCapa(countryId, file) {
   var path = countryId + "/_capa-" + Date.now() + ".jpg";
   return sbClient.storage
