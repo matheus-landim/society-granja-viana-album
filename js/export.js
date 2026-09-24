@@ -95,7 +95,7 @@ function desenharImagemCover(ctx, img, x, y, w, h) {
 }
 
 // Desenha uma imagem "contain" (cabe inteira dentro do retângulo, sem
-// cortar nada — usado pra foto capturada, pra nunca cortar rosto/conteúdo).
+// cortar nada — usado pra seleção/página, onde tem várias figurinhas juntas).
 function desenharImagemContain(ctx, img, x, y, w, h) {
   var escala = Math.min(w / img.width, h / img.height);
   var wDesenho = img.width * escala;
@@ -105,10 +105,44 @@ function desenharImagemContain(ctx, img, x, y, w, h) {
   ctx.drawImage(img, offsetX, offsetY, wDesenho, hDesenho);
 }
 
+// Desenha uma imagem "cover" preenchendo o retângulo de ponta a ponta, mas
+// ancorada no topo (só corta embaixo) — usado pra uma foto de jogador,
+// preenche igual ao post de referência sem cortar o rosto.
+function desenharImagemCoverTopo(ctx, img, x, y, w, h) {
+  var escala = Math.max(w / img.width, h / img.height);
+  var wDesenho = img.width * escala;
+  var hDesenho = img.height * escala;
+  var offsetX = x + (w - wDesenho) / 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.drawImage(img, offsetX, y, wDesenho, hDesenho);
+  ctx.restore();
+}
+
+// Carrega uma imagem (URL da foto do jogador, por exemplo) pronta pra desenhar.
+function carregarImagem(url) {
+  return new Promise(function (resolve) {
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onerror = function () { resolve(img); };
+    if (img.decode) {
+      img.src = url;
+      img.decode().then(function () { resolve(img); }).catch(function () { resolve(img); });
+    } else {
+      img.onload = function () { resolve(img); };
+      img.src = url;
+    }
+  });
+}
+
 // Monta o card final igual a um post real do Instagram: cabeçalho pequeno
-// com o logo (em círculo) + @gremio_cotia, a foto inteira (sem cortar nada)
-// numa área central, e a legenda numa faixa embaixo.
-function montarCardInstagram(canvasOriginal) {
+// com o logo (em círculo) + @gremio_cotia, a foto numa área central, e a
+// legenda numa faixa embaixo.
+// modo "cover-topo": preenche de ponta a ponta (uma foto só, tipo o post de
+// referência). modo "contain" (padrão): mostra tudo sem cortar (seleção/página).
+function montarCardInstagram(imagemOuCanvas, modo) {
   return logoPronto.then(function (logoImg) {
     var TAM = 1080;
     var cabecalhoAltura = 130;
@@ -162,13 +196,17 @@ function montarCardInstagram(canvasOriginal) {
     ctx.lineTo(TAM, cabecalhoAltura);
     ctx.stroke();
 
-    // Área da foto: mostra ela inteira, sem cortar nada (rosto incluído).
+    // Área da foto
     var faixaAltura = 130;
     var fotoY = cabecalhoAltura;
     var fotoAltura = TAM - cabecalhoAltura - faixaAltura;
-    ctx.fillStyle = "#f2f2f2";
-    ctx.fillRect(0, fotoY, TAM, fotoAltura);
-    desenharImagemContain(ctx, canvasOriginal, 0, fotoY, TAM, fotoAltura);
+    if (modo === "cover-topo") {
+      desenharImagemCoverTopo(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
+    } else {
+      ctx.fillStyle = "#f2f2f2";
+      ctx.fillRect(0, fotoY, TAM, fotoAltura);
+      desenharImagemContain(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
+    }
 
     // Legenda numa faixa sólida no rodapé
     var faixaY = TAM - faixaAltura;
@@ -183,8 +221,8 @@ function montarCardInstagram(canvasOriginal) {
   });
 }
 
-function baixarCanvas(canvasOriginal, nomeArquivo) {
-  montarCardInstagram(canvasOriginal).then(function (canvasFinal) {
+function baixarCanvas(imagemOuCanvas, nomeArquivo, modo) {
+  montarCardInstagram(imagemOuCanvas, modo).then(function (canvasFinal) {
     canvasFinal.toBlob(function (blob) {
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
@@ -221,12 +259,14 @@ function slugify(texto) {
     .replace(/(^-|-$)/g, "") || "figurinha";
 }
 
-// Exporta apenas o cartão de uma figurinha (foto + nome + número).
-function exportarFigurinha(cardEl, countryNome, nomeJogador) {
+// Exporta só a foto real do jogador (sem a moldura/inputs do card), igual
+// a um post do Instagram: logo + @gremio_cotia no topo, foto de ponta a
+// ponta, legenda embaixo.
+function exportarFigurinha(fotoUrl, countryNome, nomeJogador) {
   confirmarDownload().then(function (ok) {
     if (!ok) return;
-    capturarElemento(cardEl).then(function (canvas) {
-      baixarCanvas(canvas, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png");
+    carregarImagem(fotoUrl).then(function (img) {
+      baixarCanvas(img, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png", "cover-topo");
     });
   });
 }
@@ -236,7 +276,7 @@ function exportarSelecao(gridEl, countryNome) {
   confirmarDownload().then(function (ok) {
     if (!ok) return;
     capturarElemento(gridEl).then(function (canvas) {
-      baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png");
+      baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png", "contain");
     });
   });
 }
@@ -246,7 +286,7 @@ function exportarPagina(pageEl, countryNome) {
   confirmarDownload().then(function (ok) {
     if (!ok) return;
     capturarElemento(pageEl).then(function (canvas) {
-      baixarCanvas(canvas, "pagina-" + slugify(countryNome) + ".png");
+      baixarCanvas(canvas, "pagina-" + slugify(countryNome) + ".png", "contain");
     });
   });
 }
