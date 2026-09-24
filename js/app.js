@@ -12,19 +12,29 @@ var placeholderSVG =
     "</svg>"
   );
 
-function montarNav() {
-  var nav = document.getElementById("country-nav");
-  nav.innerHTML = "";
+function montarSeletorPaises() {
+  var lista = document.getElementById("paises-lista");
+  var modal = document.getElementById("paises-modal");
+  lista.innerHTML = "";
+
   COUNTRIES.forEach(function (c) {
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "nav-item";
+    btn.className = "pais-item";
     btn.dataset.id = c.id;
-    btn.innerHTML = '<img class="nav-flag" src="' + bandeiraUrl(c) + '" alt="">' + c.nome;
+    btn.innerHTML = '<img class="pais-item-bandeira" src="' + bandeiraUrl(c) + '" alt="">' + c.nome;
     btn.addEventListener("click", function () {
+      modal.close();
       irParaPais(c.id);
     });
-    nav.appendChild(btn);
+    lista.appendChild(btn);
+  });
+
+  document.getElementById("btn-selecionar-pais").addEventListener("click", function () {
+    modal.showModal();
+  });
+  document.getElementById("btn-fechar-paises").addEventListener("click", function () {
+    modal.close();
   });
 }
 
@@ -52,7 +62,10 @@ function aplicarTemaPagina(country) {
   document.getElementById("pagina-titulo").textContent = country.nome;
   document.title = country.nome + " — Álbum Society Granja Viana";
 
-  document.querySelectorAll(".nav-item").forEach(function (btn) {
+  document.getElementById("pais-seletor-bandeira").src = bandeiraUrl(country);
+  document.getElementById("pais-seletor-nome").textContent = country.nome;
+
+  document.querySelectorAll(".pais-item").forEach(function (btn) {
     btn.classList.toggle("ativo", btn.dataset.id === country.id);
   });
 }
@@ -202,12 +215,22 @@ function renderPagina(pagina) {
   renderGrid(pagina, pagina.countryId, country.nome);
 }
 
+function esconderTelaCarregamento() {
+  var overlay = document.getElementById("loading-overlay");
+  if (!overlay) return;
+  overlay.classList.add("loading-overlay-escondido");
+  setTimeout(function () {
+    overlay.hidden = true;
+  }, 300);
+}
+
 function carregarEExibir(countryId) {
   document.getElementById("pagina").classList.add("carregando");
   carregarPagina(countryId).then(function (dados) {
     window.paginaAtual = Object.assign({ countryId: countryId }, dados);
     renderPagina(window.paginaAtual);
     document.getElementById("pagina").classList.remove("carregando");
+    esconderTelaCarregamento();
   });
 }
 
@@ -242,7 +265,7 @@ function initEventosPagina() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  montarNav();
+  montarSeletorPaises();
   initEventosPagina();
   if (!window.location.hash) window.location.hash = "brasil";
   var idx = paisAtualIndex();
