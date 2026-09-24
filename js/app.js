@@ -20,7 +20,7 @@ function montarNav() {
     btn.type = "button";
     btn.className = "nav-item";
     btn.dataset.id = c.id;
-    btn.innerHTML = '<span class="nav-flag">' + c.bandeira + "</span>" + c.nome;
+    btn.innerHTML = '<img class="nav-flag" src="' + bandeiraUrl(c) + '" alt="">' + c.nome;
     btn.addEventListener("click", function () {
       irParaPais(c.id);
     });
@@ -45,8 +45,10 @@ function aplicarTemaPagina(country) {
   pagina.style.setProperty("--c1", country.cores[0]);
   pagina.style.setProperty("--c2", country.cores[1]);
   pagina.style.setProperty("--c3", country.cores[2]);
-  document.getElementById("pagina-bandeira").textContent = country.bandeira;
-  document.getElementById("hero-bandeira-emoji").textContent = country.bandeira;
+  document.getElementById("pagina-bandeira").src = bandeiraUrl(country);
+  document.getElementById("pagina-bandeira").alt = "Bandeira de " + country.nome;
+  document.getElementById("hero-bandeira-img").src = bandeiraUrl(country);
+  document.getElementById("hero-bandeira-img").alt = "Bandeira de " + country.nome;
   document.getElementById("pagina-titulo").textContent = country.nome;
   document.title = country.nome + " — Álbum Society Granja Viana";
 

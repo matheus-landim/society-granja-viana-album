@@ -79,6 +79,7 @@ function desenharTextoCentralizado(ctx, texto, x, y, maxLargura, fonte, cor) {
 }
 
 // Desenha uma imagem "cover" (preenche todo o retângulo, cortando o excesso).
+// Só usado pra coisas que não têm rosto/conteúdo importante nas bordas (o logo).
 function desenharImagemCover(ctx, img, x, y, w, h) {
   var escala = Math.max(w / img.width, h / img.height);
   var wDesenho = img.width * escala;
@@ -93,9 +94,20 @@ function desenharImagemCover(ctx, img, x, y, w, h) {
   ctx.restore();
 }
 
+// Desenha uma imagem "contain" (cabe inteira dentro do retângulo, sem
+// cortar nada — usado pra foto capturada, pra nunca cortar rosto/conteúdo).
+function desenharImagemContain(ctx, img, x, y, w, h) {
+  var escala = Math.min(w / img.width, h / img.height);
+  var wDesenho = img.width * escala;
+  var hDesenho = img.height * escala;
+  var offsetX = x + (w - wDesenho) / 2;
+  var offsetY = y + (h - hDesenho) / 2;
+  ctx.drawImage(img, offsetX, offsetY, wDesenho, hDesenho);
+}
+
 // Monta o card final igual a um post real do Instagram: cabeçalho pequeno
-// com o logo (em círculo) + @gremio_cotia, e a foto preenchendo o resto do
-// quadro de ponta a ponta, com a legenda em uma faixa sobre a foto.
+// com o logo (em círculo) + @gremio_cotia, a foto inteira (sem cortar nada)
+// numa área central, e a legenda numa faixa embaixo.
 function montarCardInstagram(canvasOriginal) {
   return logoPronto.then(function (logoImg) {
     var TAM = 1080;
@@ -150,20 +162,20 @@ function montarCardInstagram(canvasOriginal) {
     ctx.lineTo(TAM, cabecalhoAltura);
     ctx.stroke();
 
-    // Foto preenchendo o resto do quadro, de ponta a ponta
-    desenharImagemCover(ctx, canvasOriginal, 0, cabecalhoAltura, TAM, TAM - cabecalhoAltura);
-
-    // Legenda numa faixa translúcida sobre a base da foto
+    // Área da foto: mostra ela inteira, sem cortar nada (rosto incluído).
     var faixaAltura = 130;
-    var faixaY = TAM - faixaAltura;
-    var faixaGrad = ctx.createLinearGradient(0, faixaY, 0, TAM);
-    faixaGrad.addColorStop(0, "rgba(0,0,0,0)");
-    faixaGrad.addColorStop(1, "rgba(0,0,0,0.6)");
-    ctx.fillStyle = faixaGrad;
-    ctx.fillRect(0, faixaY, TAM, faixaAltura);
+    var fotoY = cabecalhoAltura;
+    var fotoAltura = TAM - cabecalhoAltura - faixaAltura;
+    ctx.fillStyle = "#f2f2f2";
+    ctx.fillRect(0, fotoY, TAM, fotoAltura);
+    desenharImagemContain(ctx, canvasOriginal, 0, fotoY, TAM, fotoAltura);
 
+    // Legenda numa faixa sólida no rodapé
+    var faixaY = TAM - faixaAltura;
+    ctx.fillStyle = "#0d1b2a";
+    ctx.fillRect(0, faixaY, TAM, faixaAltura);
     desenharTextoCentralizado(
-      ctx, INSTA_LEGENDA, TAM / 2, TAM - 48, TAM - 100,
+      ctx, INSTA_LEGENDA, TAM / 2, faixaY + faixaAltura / 2, TAM - 100,
       "700 34px 'Poppins', 'Segoe UI', sans-serif", "#ffffff"
     );
 

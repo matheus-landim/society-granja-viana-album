@@ -149,7 +149,7 @@ img { max-width: 100%; display: block; }
   border-color: var(--accent-dark);
   font-weight: 800;
 }
-.nav-flag { font-size: 1rem; }
+.nav-flag { width: 1.15rem; height: 0.85rem; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,0.35); }
 
 .auth-area { display: flex; gap: 0.5rem; }
 
@@ -227,7 +227,16 @@ img { max-width: 100%; display: block; }
   paint-order: stroke fill;
   filter: drop-shadow(0 3px 0 rgba(0,0,0,0.3));
 }
-.masthead-flag { font-size: 0.55em; vertical-align: middle; margin-left: 0.15em; }
+.masthead-flag {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.6em;
+  object-fit: cover;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 0.2em;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 2px 6px rgba(0,0,0,0.3);
+}
 .masthead-accent {
   width: 5.5rem;
   height: 7px;
@@ -248,7 +257,7 @@ img { max-width: 100%; display: block; }
   outline: 2px solid rgba(0,0,0,0.25);
   box-shadow: var(--shadow);
 }
-.hero-foto-img { width: 100%; height: 100%; object-fit: cover; }
+.hero-foto-img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
 .hero-legenda {
   position: absolute;
   left: 0;
@@ -270,21 +279,24 @@ img { max-width: 100%; display: block; }
 
 .hero-bandeira {
   position: relative;
-  margin: 1.5rem 0 1rem;
-  border-radius: 12px;
+  width: min(200px, 55%);
+  aspect-ratio: 4 / 3;
+  margin: 1.5rem auto 1.1rem;
+  border-radius: 14px;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
-  background: linear-gradient(135deg, var(--c1), var(--c2), var(--c3));
+  background: #ffffff;
   border: 5px solid var(--accent);
   outline: 2px solid rgba(0,0,0,0.25);
   box-shadow: var(--shadow);
   display: grid;
   place-items: center;
+  padding: 12px;
 }
-.hero-bandeira-emoji {
-  font-size: clamp(4rem, 22vw, 9rem);
-  line-height: 1;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+.hero-bandeira-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
 }
 
 .hero-foto-adicional {
@@ -321,13 +333,13 @@ img { max-width: 100%; display: block; }
 }
 
 @media (min-width: 480px) {
-  .grid-figurinhas { grid-template-columns: repeat(3, 1fr); }
+  .grid-figurinhas { grid-template-columns: repeat(2, 1fr); }
 }
 @media (min-width: 720px) {
-  .grid-figurinhas { grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+  .grid-figurinhas { grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
 }
 @media (min-width: 960px) {
-  .grid-figurinhas { grid-template-columns: repeat(6, 1fr); }
+  .grid-figurinhas { grid-template-columns: repeat(4, 1fr); }
 }
 
 .figurinha-card {
@@ -374,7 +386,7 @@ img { max-width: 100%; display: block; }
   background: #e7e7ef;
   border-bottom: 3px solid var(--c2);
 }
-.figurinha-foto img { width: 100%; height: 100%; object-fit: cover; }
+.figurinha-foto img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; }
 
 .figurinha-baixar-dica {
   position: absolute;
