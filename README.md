@@ -15,9 +15,11 @@ Japão, México, Portugal, Suécia e Uruguai.
   da camisa, trocar a foto de capa da página.
 - **Baixar imagens**: qualquer visitante pode tocar numa figurinha para
   baixar a foto daquele jogador, ou usar os botões para salvar a seleção
-  inteira (grade) ou a página inteira (com o tema do país) como PNG. Toda
-  imagem exportada sai com a marca "**Society Granja Viana**" gravada no
-  rodapé.
+  inteira (grade) ou a página inteira (com o tema do país) como PNG. Antes
+  de baixar, aparece um aviso de confirmação. A imagem exportada sai como
+  um card estilo Instagram: logo da Escola de Futebol Grêmio Cotia no
+  topo, a foto no meio, e a legenda "Eu participei do Campeonato Interno
+  2026" + `@gremio_cotia` no rodapé — tudo gravado na própria imagem.
 
 Site estático (HTML/CSS/JS puro, sem build). O armazenamento das fotos e
 dos dados é feito no **Supabase** (Auth + Postgres + Storage), que tem
@@ -118,7 +120,8 @@ js/supabase-config.js    Config do Supabase (preencher, passo 4)
 js/countries.js          Lista dos 16 países + cores de cada bandeira
 js/auth.js               Login/logout (usuário/senha fixo, sem cadastro)
 js/album.js               Leitura/escrita das figurinhas e fotos no Supabase
-js/export.js               Exportação de imagens (figurinha, seleção, página) com marca d'água
+js/export.js               Exportação em card estilo Instagram (logo, legenda, @handle) + confirmação
+assets/logo-gremio-cotia.png  Logo usado no topo do card exportado
 js/app.js                   Navegação entre países e renderização da página atual
 supabase/schema.sql                        Script único: tabelas + bucket + regras + as 11 figurinhas de cada país
 supabase/migracao-11-jogadores.sql          Migração para quem já tinha rodado uma versão antiga do schema
@@ -127,8 +130,10 @@ supabase/migracao-11-jogadores.sql          Migração para quem já tinha rodad
 
 ## Personalizações comuns
 
-- **Trocar o texto da marca d'água**: edite a constante `MARCA_DAGUA` no
-  topo de `js/export.js`.
+- **Trocar a legenda, o @ ou o logo do card exportado**: edite as
+  constantes `INSTA_LEGENDA`, `INSTA_HANDLE` e `LOGO_URL` no topo de
+  `js/export.js` (troque também o arquivo `assets/logo-gremio-cotia.png`
+  se quiser usar outro logo).
 - **Adicionar/remover um país**: edite o array `COUNTRIES` em
   `js/countries.js` (cada item tem `id`, `nome`, `bandeira` e as 3 `cores`
   usadas nos detalhes da página) e ajuste a lista de países no
