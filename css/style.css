@@ -261,6 +261,7 @@ img { max-width: 100%; display: block; }
 .hero-legenda {
   position: absolute;
   left: 0;
+  right: 0;
   bottom: 0;
   margin: 0;
   padding: 0.5em 1.1em;
@@ -270,6 +271,17 @@ img { max-width: 100%; display: block; }
   font-family: "Bebas Neue", "Poppins", sans-serif;
   font-size: 1.05rem;
   letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.hero-legenda-bandeira {
+  width: 1.3em;
+  height: 1em;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.4);
+  flex: none;
 }
 .hero-foto .upload-btn {
   position: absolute;

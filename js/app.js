@@ -58,8 +58,20 @@ function aplicarTemaPagina(country) {
 }
 
 function renderCapa(pagina) {
+  var secao = document.getElementById("hero-foto-adicional");
   var img = document.getElementById("capa-img");
+  var country = getCountry(pagina.countryId);
+
+  // Sem foto do time e ninguém logado pra enviar uma: esconde a seção.
+  if (!pagina.capaUrl && !currentUser) {
+    secao.hidden = true;
+    return;
+  }
+
+  secao.hidden = false;
   img.src = pagina.capaUrl || placeholderSVG;
+  document.getElementById("hero-legenda-bandeira").src = bandeiraUrl(country);
+  document.getElementById("hero-legenda-nome").textContent = country.nome;
 }
 
 function criarCardFigurinha(fig, countryId, countryNome) {
@@ -112,7 +124,7 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   card.addEventListener("click", function (e) {
     if (e.target.closest(".somente-edicao") || e.target.tagName === "INPUT") return;
     var nomeAtual = card.querySelector(".figurinha-nome").value || "jogador";
-    exportarFigurinha(card, countryNome, nomeAtual);
+    exportarFigurinha(fig.fotoUrl || placeholderSVG, countryNome, nomeAtual);
   });
 
   return card;
