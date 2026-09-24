@@ -171,30 +171,28 @@ function renderGrid(pagina, countryId, countryNome) {
   }
 }
 
-function renderPatrocinadores(patrocinadores) {
+function renderPatrocinador(patrocinador) {
   var secao = document.getElementById("patrocinadores-secao");
-  var grid = document.getElementById("patrocinadores-grid");
+  var container = document.getElementById("patrocinadores-grid");
 
-  if (!patrocinadores || !patrocinadores.length) {
+  if (!patrocinador) {
     secao.hidden = true;
     return;
   }
 
   secao.hidden = false;
-  grid.innerHTML = "";
-  patrocinadores.forEach(function (p) {
-    var item = document.createElement(p.link ? "a" : "div");
-    item.className = "patrocinador-item";
-    if (p.link) {
-      item.href = p.link;
-      item.target = "_blank";
-      item.rel = "noopener";
-    }
-    item.innerHTML =
-      '<img src="' + (p.logoUrl || placeholderSVG) + '" alt="' + escapeAttr(p.nome) + '">';
-    item.title = p.nome;
-    grid.appendChild(item);
-  });
+  container.innerHTML = "";
+  var item = document.createElement(patrocinador.link ? "a" : "div");
+  item.className = "patrocinador-item";
+  if (patrocinador.link) {
+    item.href = patrocinador.link;
+    item.target = "_blank";
+    item.rel = "noopener";
+  }
+  item.innerHTML =
+    '<img src="' + (patrocinador.logoUrl || placeholderSVG) + '" alt="' + escapeAttr(patrocinador.nome) + '">' +
+    '<span class="patrocinador-nome">' + escapeAttr(patrocinador.nome) + "</span>";
+  container.appendChild(item);
 }
 
 function renderPagina(pagina) {
@@ -202,6 +200,7 @@ function renderPagina(pagina) {
   aplicarTemaPagina(country);
   renderCapa(pagina);
   renderGrid(pagina, pagina.countryId, country.nome);
+  renderPatrocinador(pagina.patrocinador);
 }
 
 var inicioCarregamento = Date.now();
@@ -283,7 +282,4 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!window.location.hash) window.location.hash = "brasil";
   var idx = paisAtualIndex();
   carregarEExibir(COUNTRIES[idx].id);
-
-  // Lista de patrocinadores é a mesma em toda página, carrega uma vez só.
-  carregarPatrocinadores().then(renderPatrocinadores);
 });
