@@ -169,6 +169,32 @@ function renderGrid(pagina, countryId, countryNome) {
   }
 }
 
+function renderPatrocinadores(patrocinadores) {
+  var secao = document.getElementById("patrocinadores-secao");
+  var grid = document.getElementById("patrocinadores-grid");
+
+  if (!patrocinadores || !patrocinadores.length) {
+    secao.hidden = true;
+    return;
+  }
+
+  secao.hidden = false;
+  grid.innerHTML = "";
+  patrocinadores.forEach(function (p) {
+    var item = document.createElement(p.link ? "a" : "div");
+    item.className = "patrocinador-item";
+    if (p.link) {
+      item.href = p.link;
+      item.target = "_blank";
+      item.rel = "noopener";
+    }
+    item.innerHTML =
+      '<img src="' + (p.logoUrl || placeholderSVG) + '" alt="' + escapeAttr(p.nome) + '">';
+    item.title = p.nome;
+    grid.appendChild(item);
+  });
+}
+
 function renderPagina(pagina) {
   var country = getCountry(pagina.countryId);
   aplicarTemaPagina(country);
@@ -226,4 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!window.location.hash) window.location.hash = "brasil";
   var idx = paisAtualIndex();
   carregarEExibir(COUNTRIES[idx].id);
+
+  // Lista de patrocinadores é a mesma em toda página, carrega uma vez só.
+  carregarPatrocinadores().then(renderPatrocinadores);
 });
