@@ -74,22 +74,6 @@ function desenharImagemContain(ctx, img, x, y, w, h) {
   ctx.drawImage(img, offsetX, offsetY, wDesenho, hDesenho);
 }
 
-// Desenha uma imagem "cover" preenchendo o retângulo de ponta a ponta, mas
-// ancorada no topo (só corta embaixo) — usado pra uma foto de jogador,
-// preenche igual ao post de referência sem cortar o rosto.
-function desenharImagemCoverTopo(ctx, img, x, y, w, h) {
-  var escala = Math.max(w / img.width, h / img.height);
-  var wDesenho = img.width * escala;
-  var hDesenho = img.height * escala;
-  var offsetX = x + (w - wDesenho) / 2;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(x, y, w, h);
-  ctx.clip();
-  ctx.drawImage(img, offsetX, y, wDesenho, hDesenho);
-  ctx.restore();
-}
-
 // Carrega uma imagem (URL da foto do jogador, por exemplo) pronta pra desenhar.
 function carregarImagem(url) {
   return new Promise(function (resolve) {
@@ -107,11 +91,9 @@ function carregarImagem(url) {
 }
 
 // Monta o card final igual a um post real do Instagram: cabeçalho pequeno
-// com o logo (em círculo) + @gremio_cotia, e a foto preenchendo o resto
-// do quadro.
-// modo "cover-topo": preenche de ponta a ponta (uma foto só, tipo o post de
-// referência). modo "contain" (padrão): mostra tudo sem cortar (seleção).
-function montarCardInstagram(imagemOuCanvas, modo) {
+// com o logo (em círculo) + @gremio_cotia, e a foto inteira (sem cortar
+// nada, nunca — nem o jogador nem o rosto) preenchendo o resto do quadro.
+function montarCardInstagram(imagemOuCanvas) {
   return logoPronto.then(function (logoImg) {
     var TAM = 1080;
     var cabecalhoAltura = 130;
@@ -165,23 +147,19 @@ function montarCardInstagram(imagemOuCanvas, modo) {
     ctx.lineTo(TAM, cabecalhoAltura);
     ctx.stroke();
 
-    // Área da foto: preenche o resto do quadro até embaixo.
+    // Área da foto: mostra ela inteira, sem cortar nada.
     var fotoY = cabecalhoAltura;
     var fotoAltura = TAM - cabecalhoAltura;
-    if (modo === "cover-topo") {
-      desenharImagemCoverTopo(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
-    } else {
-      ctx.fillStyle = "#f2f2f2";
-      ctx.fillRect(0, fotoY, TAM, fotoAltura);
-      desenharImagemContain(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
-    }
+    ctx.fillStyle = "#f2f2f2";
+    ctx.fillRect(0, fotoY, TAM, fotoAltura);
+    desenharImagemContain(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
 
     return out;
   });
 }
 
-function baixarCanvas(imagemOuCanvas, nomeArquivo, modo) {
-  montarCardInstagram(imagemOuCanvas, modo).then(function (canvasFinal) {
+function baixarCanvas(imagemOuCanvas, nomeArquivo) {
+  montarCardInstagram(imagemOuCanvas).then(function (canvasFinal) {
     canvasFinal.toBlob(function (blob) {
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
@@ -219,13 +197,13 @@ function slugify(texto) {
 }
 
 // Exporta só a foto real do jogador (sem a moldura/inputs do card), igual
-// a um post do Instagram: logo + @gremio_cotia no topo, foto de ponta a
-// ponta embaixo.
+// a um post do Instagram: logo + @gremio_cotia no topo, foto inteira
+// (nunca cortada) embaixo.
 function exportarFigurinha(fotoUrl, countryNome, nomeJogador) {
   confirmarDownload().then(function (ok) {
     if (!ok) return;
     carregarImagem(fotoUrl).then(function (img) {
-      baixarCanvas(img, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png", "cover-topo");
+      baixarCanvas(img, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png");
     });
   });
 }
@@ -235,7 +213,7 @@ function exportarSelecao(gridEl, countryNome) {
   confirmarDownload().then(function (ok) {
     if (!ok) return;
     capturarElemento(gridEl).then(function (canvas) {
-      baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png", "contain");
+      baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png");
     });
   });
 }
