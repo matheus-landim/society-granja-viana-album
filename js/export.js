@@ -78,78 +78,94 @@ function desenharTextoCentralizado(ctx, texto, x, y, maxLargura, fonte, cor) {
   }
 }
 
-// Monta o card final no formato Instagram (1080x1080): logo da escola no
-// topo, a imagem capturada (figurinha/seleção/página) no meio, e a legenda
-// + @handle no rodapé.
+// Desenha uma imagem "cover" (preenche todo o retângulo, cortando o excesso).
+function desenharImagemCover(ctx, img, x, y, w, h) {
+  var escala = Math.max(w / img.width, h / img.height);
+  var wDesenho = img.width * escala;
+  var hDesenho = img.height * escala;
+  var offsetX = x + (w - wDesenho) / 2;
+  var offsetY = y + (h - hDesenho) / 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.drawImage(img, offsetX, offsetY, wDesenho, hDesenho);
+  ctx.restore();
+}
+
+// Monta o card final igual a um post real do Instagram: cabeçalho pequeno
+// com o logo (em círculo) + @gremio_cotia, e a foto preenchendo o resto do
+// quadro de ponta a ponta, com a legenda em uma faixa sobre a foto.
 function montarCardInstagram(canvasOriginal) {
   return logoPronto.then(function (logoImg) {
     var TAM = 1080;
+    var cabecalhoAltura = 130;
     var out = document.createElement("canvas");
     out.width = TAM;
     out.height = TAM;
     var ctx = out.getContext("2d");
 
+    // Cabeçalho estilo post do Instagram
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, TAM, TAM);
 
-    ctx.strokeStyle = "#0d1b2a";
-    ctx.lineWidth = 10;
-    ctx.strokeRect(20, 20, TAM - 40, TAM - 40);
-
-    var topo = 60;
+    var raioLogo = 42;
+    var cxLogo = 76;
+    var cyLogo = cabecalhoAltura / 2;
 
     if (logoImg) {
-      var logoLado = 210;
-      ctx.drawImage(logoImg, (TAM - logoLado) / 2, topo, logoLado, logoLado);
-      topo += logoLado + 26;
-    } else {
-      topo += 20;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cxLogo, cyLogo, raioLogo, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      desenharImagemCover(ctx, logoImg, cxLogo - raioLogo, cyLogo - raioLogo, raioLogo * 2, raioLogo * 2);
+      ctx.restore();
+      ctx.strokeStyle = "#e0e0e0";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cxLogo, cyLogo, raioLogo, 0, Math.PI * 2);
+      ctx.stroke();
     }
 
-    ctx.strokeStyle = "#1e8bc3";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(TAM * 0.28, topo);
-    ctx.lineTo(TAM * 0.72, topo);
-    ctx.stroke();
-    topo += 28;
-
-    var baixoReservado = 190;
-    var areaX = 70;
-    var areaLargura = TAM - areaX * 2;
-    var areaY = topo;
-    var areaAltura = TAM - baixoReservado - areaY;
-
-    var escala = Math.min(areaLargura / canvasOriginal.width, areaAltura / canvasOriginal.height);
-    var wDesenho = canvasOriginal.width * escala;
-    var hDesenho = canvasOriginal.height * escala;
-    var xDesenho = areaX + (areaLargura - wDesenho) / 2;
-    var yDesenho = areaY + (areaAltura - hDesenho) / 2;
-
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.25)";
-    ctx.shadowBlur = 18;
-    ctx.shadowOffsetY = 6;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(xDesenho - 6, yDesenho - 6, wDesenho + 12, hDesenho + 12);
-    ctx.restore();
-
-    ctx.strokeStyle = "#0d1b2a";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(xDesenho - 6, yDesenho - 6, wDesenho + 12, hDesenho + 12);
-    ctx.drawImage(canvasOriginal, xDesenho, yDesenho, wDesenho, hDesenho);
-
-    var legendaY = TAM - baixoReservado + 58;
-    desenharTextoCentralizado(
-      ctx, INSTA_LEGENDA, TAM / 2, legendaY, TAM - 140,
-      "700 40px 'Poppins', 'Segoe UI', sans-serif", "#0d1b2a"
-    );
-
-    ctx.font = "600 32px 'Poppins', 'Segoe UI', sans-serif";
-    ctx.fillStyle = "#1e8bc3";
-    ctx.textAlign = "center";
+    ctx.font = "700 36px 'Poppins', 'Segoe UI', sans-serif";
+    ctx.fillStyle = "#0d1b2a";
+    ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    ctx.fillText(INSTA_HANDLE, TAM / 2, TAM - 58);
+    ctx.fillText(INSTA_HANDLE, cxLogo + raioLogo + 24, cyLogo);
+
+    // "..." de menu, só pra lembrar a cara de um post mesmo
+    ctx.fillStyle = "#8a8a8a";
+    var pontosX = TAM - 70;
+    [-16, 0, 16].forEach(function (dx) {
+      ctx.beginPath();
+      ctx.arc(pontosX + dx, cabecalhoAltura / 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.strokeStyle = "#efefef";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, cabecalhoAltura);
+    ctx.lineTo(TAM, cabecalhoAltura);
+    ctx.stroke();
+
+    // Foto preenchendo o resto do quadro, de ponta a ponta
+    desenharImagemCover(ctx, canvasOriginal, 0, cabecalhoAltura, TAM, TAM - cabecalhoAltura);
+
+    // Legenda numa faixa translúcida sobre a base da foto
+    var faixaAltura = 130;
+    var faixaY = TAM - faixaAltura;
+    var faixaGrad = ctx.createLinearGradient(0, faixaY, 0, TAM);
+    faixaGrad.addColorStop(0, "rgba(0,0,0,0)");
+    faixaGrad.addColorStop(1, "rgba(0,0,0,0.6)");
+    ctx.fillStyle = faixaGrad;
+    ctx.fillRect(0, faixaY, TAM, faixaAltura);
+
+    desenharTextoCentralizado(
+      ctx, INSTA_LEGENDA, TAM / 2, TAM - 48, TAM - 100,
+      "700 34px 'Poppins', 'Segoe UI', sans-serif", "#ffffff"
+    );
 
     return out;
   });
