@@ -134,12 +134,39 @@ function escapeAttr(v) {
   return String(v || "").replace(/"/g, "&quot;");
 }
 
+function criarCardAdicionar(pagina, countryId, countryNome) {
+  var card = document.createElement("button");
+  card.type = "button";
+  card.className = "figurinha-add";
+  card.innerHTML = '<span class="figurinha-add-icon">+</span><span class="figurinha-add-texto">Adicionar jogador</span>';
+  card.addEventListener("click", function () {
+    var maiorOrdem = pagina.figurinhas.reduce(function (max, f) { return Math.max(max, f.ordem); }, 0);
+    adicionarFigurinha(countryId, maiorOrdem + 1).then(function (novaFig) {
+      pagina.figurinhas.push(novaFig);
+      renderGrid(pagina, countryId, countryNome);
+    });
+  });
+  return card;
+}
+
 function renderGrid(pagina, countryId, countryNome) {
   var grid = document.getElementById("grid-figurinhas");
   grid.innerHTML = "";
-  pagina.figurinhas.forEach(function (fig) {
+  var logado = !!currentUser;
+
+  // Pra quem não está logado, esconde as figurinhas ainda sem jogador
+  // (sem nome nem foto). Quem está logado vê tudo, pra poder completar.
+  var visiveis = logado
+    ? pagina.figurinhas
+    : pagina.figurinhas.filter(function (fig) { return fig.nome || fig.fotoUrl; });
+
+  visiveis.forEach(function (fig) {
     grid.appendChild(criarCardFigurinha(fig, countryId, countryNome));
   });
+
+  if (logado) {
+    grid.appendChild(criarCardAdicionar(pagina, countryId, countryNome));
+  }
 }
 
 function renderPagina(pagina) {
@@ -185,11 +212,6 @@ function initEventosPagina() {
   document.getElementById("btn-exportar-selecao").addEventListener("click", function () {
     var country = getCountry(window.paginaAtual.countryId);
     exportarSelecao(document.getElementById("grid-figurinhas"), country.nome);
-  });
-
-  document.getElementById("btn-exportar-pagina").addEventListener("click", function () {
-    var country = getCountry(window.paginaAtual.countryId);
-    exportarPagina(document.getElementById("pagina"), country.nome);
   });
 
   window.addEventListener("hashchange", function () {

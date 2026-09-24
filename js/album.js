@@ -57,6 +57,18 @@ function enviarFotoFigurinha(countryId, figId, file) {
     });
 }
 
+function adicionarFigurinha(countryId, ordem) {
+  return sbClient
+    .from("figurinhas")
+    .insert({ country_id: countryId, ordem: ordem, numero: String(ordem), nome: "" })
+    .select()
+    .single()
+    .then(function (res) {
+      if (res.error) throw res.error;
+      return mapFigurinha(res.data);
+    });
+}
+
 function enviarCapa(countryId, file) {
   var path = countryId + "/_capa-" + Date.now() + ".jpg";
   return sbClient.storage

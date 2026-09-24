@@ -1,8 +1,8 @@
-// Exportação de imagens (figurinha individual / seleção / página inteira)
-// no formato de card para Instagram: logo da escola + foto + legenda + @handle.
+// Exportação de imagens (figurinha individual / seleção completa) no
+// formato de card para Instagram: logo da escola + @handle no topo, foto
+// preenchendo o resto do quadro.
 
 var LOGO_URL = "assets/logo-gremio-cotia.png";
-var INSTA_LEGENDA = "Eu participei do Campeonato Interno 2026";
 var INSTA_HANDLE = "@gremio_cotia";
 
 var logoPronto = (function () {
@@ -45,37 +45,6 @@ function confirmarDownload() {
     modal.addEventListener("close", aoFechar);
     modal.showModal();
   });
-}
-
-function desenharTextoCentralizado(ctx, texto, x, y, maxLargura, fonte, cor) {
-  ctx.font = fonte;
-  ctx.fillStyle = cor;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  if (ctx.measureText(texto).width <= maxLargura) {
-    ctx.fillText(texto, x, y);
-    return;
-  }
-
-  var palavras = texto.split(" ");
-  var linha1 = "";
-  var linha2 = "";
-  for (var i = 0; i < palavras.length; i++) {
-    var tentativa = (linha1 ? linha1 + " " : "") + palavras[i];
-    if (!linha1 || ctx.measureText(tentativa).width <= maxLargura) {
-      linha1 = tentativa;
-    } else {
-      linha2 = palavras.slice(i).join(" ");
-      break;
-    }
-  }
-  if (linha2) {
-    ctx.fillText(linha1, x, y - 24);
-    ctx.fillText(linha2, x, y + 24);
-  } else {
-    ctx.fillText(linha1, x, y);
-  }
 }
 
 // Desenha uma imagem "cover" (preenche todo o retângulo, cortando o excesso).
@@ -138,10 +107,10 @@ function carregarImagem(url) {
 }
 
 // Monta o card final igual a um post real do Instagram: cabeçalho pequeno
-// com o logo (em círculo) + @gremio_cotia, a foto numa área central, e a
-// legenda numa faixa embaixo.
+// com o logo (em círculo) + @gremio_cotia, e a foto preenchendo o resto
+// do quadro.
 // modo "cover-topo": preenche de ponta a ponta (uma foto só, tipo o post de
-// referência). modo "contain" (padrão): mostra tudo sem cortar (seleção/página).
+// referência). modo "contain" (padrão): mostra tudo sem cortar (seleção).
 function montarCardInstagram(imagemOuCanvas, modo) {
   return logoPronto.then(function (logoImg) {
     var TAM = 1080;
@@ -196,10 +165,9 @@ function montarCardInstagram(imagemOuCanvas, modo) {
     ctx.lineTo(TAM, cabecalhoAltura);
     ctx.stroke();
 
-    // Área da foto
-    var faixaAltura = 130;
+    // Área da foto: preenche o resto do quadro até embaixo.
     var fotoY = cabecalhoAltura;
-    var fotoAltura = TAM - cabecalhoAltura - faixaAltura;
+    var fotoAltura = TAM - cabecalhoAltura;
     if (modo === "cover-topo") {
       desenharImagemCoverTopo(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
     } else {
@@ -207,15 +175,6 @@ function montarCardInstagram(imagemOuCanvas, modo) {
       ctx.fillRect(0, fotoY, TAM, fotoAltura);
       desenharImagemContain(ctx, imagemOuCanvas, 0, fotoY, TAM, fotoAltura);
     }
-
-    // Legenda numa faixa sólida no rodapé
-    var faixaY = TAM - faixaAltura;
-    ctx.fillStyle = "#0d1b2a";
-    ctx.fillRect(0, faixaY, TAM, faixaAltura);
-    desenharTextoCentralizado(
-      ctx, INSTA_LEGENDA, TAM / 2, faixaY + faixaAltura / 2, TAM - 100,
-      "700 34px 'Poppins', 'Segoe UI', sans-serif", "#ffffff"
-    );
 
     return out;
   });
@@ -261,7 +220,7 @@ function slugify(texto) {
 
 // Exporta só a foto real do jogador (sem a moldura/inputs do card), igual
 // a um post do Instagram: logo + @gremio_cotia no topo, foto de ponta a
-// ponta, legenda embaixo.
+// ponta embaixo.
 function exportarFigurinha(fotoUrl, countryNome, nomeJogador) {
   confirmarDownload().then(function (ok) {
     if (!ok) return;
@@ -277,16 +236,6 @@ function exportarSelecao(gridEl, countryNome) {
     if (!ok) return;
     capturarElemento(gridEl).then(function (canvas) {
       baixarCanvas(canvas, "selecao-" + slugify(countryNome) + ".png", "contain");
-    });
-  });
-}
-
-// Exporta a página inteira (tema do país + toda a grade de figurinhas).
-function exportarPagina(pageEl, countryNome) {
-  confirmarDownload().then(function (ok) {
-    if (!ok) return;
-    capturarElemento(pageEl).then(function (canvas) {
-      baixarCanvas(canvas, "pagina-" + slugify(countryNome) + ".png", "contain");
     });
   });
 }

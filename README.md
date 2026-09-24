@@ -7,19 +7,21 @@ Japão, México, Portugal, Suécia e Uruguai.
 
 - **Qualquer pessoa** pode abrir o link e folhear o álbum (setas ◀ ▶ ou o
   menu de países no topo).
-- Cada página tem exatamente **11 figurinhas fixas** (os 11 titulares),
-  em estilo Panini: emblema do país, foto do time, faixa dourada com o
-  nome, grade de figurinhas numeradas.
+- Cada página mostra só as figurinhas que já têm jogador (nome ou foto);
+  slots vazios ficam escondidos para quem só está visitando, em estilo
+  Panini: emblema do país, foto do time, faixa dourada com o nome, grade
+  de figurinhas numeradas.
 - **Login único** (usuário/senha fixos, sem tela de cadastro) libera o modo
   de edição: enviar/trocar a foto de cada jogador, editar nome e número
-  da camisa, trocar a foto de capa da página.
+  da camisa, trocar a foto de capa da página, e adicionar mais jogadores
+  (card "+ Adicionar jogador" no fim da grade) quando o time tiver mais
+  de 11 jogadores.
 - **Baixar imagens**: qualquer visitante pode tocar numa figurinha para
-  baixar a foto daquele jogador, ou usar os botões para salvar a seleção
-  inteira (grade) ou a página inteira (com o tema do país) como PNG. Antes
-  de baixar, aparece um aviso de confirmação. A imagem exportada sai como
-  um card estilo Instagram: logo da Escola de Futebol Grêmio Cotia no
-  topo, a foto no meio, e a legenda "Eu participei do Campeonato Interno
-  2026" + `@gremio_cotia` no rodapé — tudo gravado na própria imagem.
+  baixar a foto daquele jogador, ou usar o botão para salvar a seleção
+  inteira (grade) como PNG. Antes de baixar, aparece um aviso de
+  confirmação. A imagem exportada sai como um card estilo Instagram: logo
+  da Escola de Futebol Grêmio Cotia + `@gremio_cotia` no topo e a foto
+  preenchendo o resto do quadro — tudo gravado na própria imagem.
 
 Site estático (HTML/CSS/JS puro, sem build). O armazenamento das fotos e
 dos dados é feito no **Supabase** (Auth + Postgres + Storage), que tem
@@ -120,7 +122,7 @@ js/supabase-config.js    Config do Supabase (preencher, passo 4)
 js/countries.js          Lista dos 16 países + cores de cada bandeira
 js/auth.js               Login/logout (usuário/senha fixo, sem cadastro)
 js/album.js               Leitura/escrita das figurinhas e fotos no Supabase
-js/export.js               Exportação em card estilo Instagram (logo, legenda, @handle) + confirmação
+js/export.js               Exportação em card estilo Instagram (logo, @handle) + confirmação
 assets/logo-gremio-cotia.png  Logo usado no topo do card exportado
 js/app.js                   Navegação entre países e renderização da página atual
 supabase/schema.sql                        Script único: tabelas + bucket + regras + as 11 figurinhas de cada país
@@ -130,14 +132,13 @@ supabase/migracao-11-jogadores.sql          Migração para quem já tinha rodad
 
 ## Personalizações comuns
 
-- **Trocar a legenda, o @ ou o logo do card exportado**: edite as
-  constantes `INSTA_LEGENDA`, `INSTA_HANDLE` e `LOGO_URL` no topo de
-  `js/export.js` (troque também o arquivo `assets/logo-gremio-cotia.png`
-  se quiser usar outro logo).
+- **Trocar o @ ou o logo do card exportado**: edite as constantes
+  `INSTA_HANDLE` e `LOGO_URL` no topo de `js/export.js` (troque também o
+  arquivo `assets/logo-gremio-cotia.png` se quiser usar outro logo).
 - **Adicionar/remover um país**: edite o array `COUNTRIES` em
-  `js/countries.js` (cada item tem `id`, `nome`, `bandeira` e as 3 `cores`
-  usadas nos detalhes da página) e ajuste a lista de países no
-  `supabase/schema.sql`.
+  `js/countries.js` (cada item tem `id`, `nome`, `codigo` — usado para
+  buscar a bandeira real em flagcdn.com — e as 3 `cores` usadas nos
+  detalhes da página) e ajuste a lista de países no `supabase/schema.sql`.
 - **Mudar de 11 para outro número de jogadores**: ajuste o
   `generate_series(1, 11)` em `supabase/schema.sql` (ou na migração) para
   o número desejado.
