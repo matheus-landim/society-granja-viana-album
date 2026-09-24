@@ -257,7 +257,7 @@ img { max-width: 100%; display: block; }
   outline: 2px solid rgba(0,0,0,0.25);
   box-shadow: var(--shadow);
 }
-.hero-foto-img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+.hero-foto-img { width: 100%; height: 100%; object-fit: contain; }
 .hero-legenda {
   position: absolute;
   left: 0;
@@ -417,7 +417,7 @@ img { max-width: 100%; display: block; }
   background: #e7e7ef;
   border-bottom: 3px solid var(--c2);
 }
-.figurinha-foto img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; }
+.figurinha-foto img { width: 100%; height: 100%; object-fit: contain; }
 
 .figurinha-baixar-dica {
   position: absolute;

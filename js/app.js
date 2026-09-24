@@ -235,11 +235,6 @@ function initEventosPagina() {
     });
   });
 
-  document.getElementById("btn-exportar-selecao").addEventListener("click", function () {
-    var country = getCountry(window.paginaAtual.countryId);
-    exportarSelecao(document.getElementById("grid-figurinhas"), country.nome);
-  });
-
   window.addEventListener("hashchange", function () {
     var idx = paisAtualIndex();
     carregarEExibir(COUNTRIES[idx].id);
