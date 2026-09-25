@@ -945,9 +945,16 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
     display: none !important;
   }
 
+  html, body { height: 100%; }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .pagina {
     margin: 0 auto;
-    max-width: 100%;
+    max-width: 680px;
   }
   .pagina.carregando { opacity: 1; }
 
@@ -955,7 +962,7 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
     break-inside: avoid;
   }
   .figurinha-card::after { display: none; }
-  .figurinha-foto { aspect-ratio: 3 / 2.5; }
+  .figurinha-foto { aspect-ratio: 3 / 3.2; }
   .figurinha-info { padding: 0.25em 0.35em 0.3em; }
   .figurinha-numero-tag { padding: 0.1em 0.6em; margin-bottom: 0.15em; }
 
