@@ -317,6 +317,10 @@ function carregarEExibir(countryId) {
 }
 
 function initEventosPagina() {
+  document.getElementById("btn-baixar-pdf").addEventListener("click", function () {
+    window.print();
+  });
+
   document.getElementById("prev-country").addEventListener("click", function () {
     var idx = paisAtualIndex();
     var novo = (idx - 1 + COUNTRIES.length) % COUNTRIES.length;

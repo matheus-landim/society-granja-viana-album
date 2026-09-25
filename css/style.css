@@ -860,3 +860,66 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
 @media (prefers-reduced-motion: reduce) {
   .figurinha-card::after { animation: none; }
 }
+
+/* ---------- Impressão / baixar PDF da página (uma folha A4) ---------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    background: #fff !important;
+  }
+  body::before, body::after { display: none !important; }
+
+  .topbar, .country-flags, .tela-inicio, .site-footer, .cookie-aviso,
+  #loading-overlay, .seta, .pagina-acoes, .grid-dica,
+  .somente-edicao, .figurinha-baixar-dica, .patrocinador-instagram {
+    display: none !important;
+  }
+
+  .pagina {
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    max-width: 100%;
+    background: #fff;
+  }
+  .pagina::before { display: none; }
+  .pagina.carregando { opacity: 1; }
+
+  .figurinha-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .figurinha-card::after { display: none; }
+  .figurinha-foto { aspect-ratio: 3 / 2.5; }
+  .figurinha-info { padding: 0.25em 0.35em 0.3em; }
+  .figurinha-numero-tag { padding: 0.1em 0.6em; margin-bottom: 0.15em; }
+
+  .grid-figurinhas { grid-template-columns: repeat(4, 1fr) !important; gap: 0.3rem; }
+
+  .masthead, .hero-bandeira, .patrocinadores, .hero-foto-adicional {
+    break-inside: avoid;
+  }
+
+  .masthead { padding: 0.2rem 1rem 0.05rem; }
+  .masthead-kicker { margin: 0; font-size: 0.6rem; }
+  .masthead-titulo { font-size: 1.4rem; }
+  .masthead-accent { margin: 0.25rem auto 0; height: 4px; }
+
+  .hero-bandeira { width: 60px; margin: 0.4rem auto; }
+
+  .patrocinadores { margin: 0.3rem 0; padding-bottom: 0.3rem; }
+  .patrocinadores-titulo { margin: 0 0 0.3rem; font-size: 0.85rem; }
+  .patrocinador-item { padding: 0.25rem 0.5rem; max-width: 130px; gap: 0.2rem; }
+  .patrocinador-item img { max-height: 2rem; }
+  .patrocinador-nome { font-size: 0.65rem; }
+
+  .hero-foto { margin: 0.4rem 0; }
+  .hero-foto-adicional { max-width: 150px; }
+  .hero-foto-adicional .hero-legenda { font-size: 0.6rem; padding: 0.3em 0.6em; }
+}

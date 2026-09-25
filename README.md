@@ -31,6 +31,11 @@ Japão, México, Portugal, Suécia e Uruguai.
   da Escola de Futebol Grêmio Cotia + `@gremio_cotia` no topo e a foto
   inteira (nunca cortada, nem o rosto) preenchendo o resto do quadro —
   tudo gravado na própria imagem.
+- **Baixar PDF da página**: o botão "🖨️ Baixar PDF da página" (logo abaixo
+  do título de cada seleção) abre a janela de impressão do navegador, já
+  formatada pra caber numa folha A4 (é só escolher "Salvar como PDF" no
+  destino). Sai só o conteúdo da página — sem menus, botões ou aviso de
+  cookies.
 - **Patrocinadores**: cada seleção tem o seu próprio patrocinador (como
   na tradição do campeonato: Portugal/Fortland, Croácia/J Design,
   Bélgica/Amplios, Brasil/Society Granja Viana, etc), mostrado no fim da
