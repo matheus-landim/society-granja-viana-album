@@ -86,28 +86,24 @@ function mostrarPaginaPais() {
   document.getElementById("btn-momentos").classList.remove("ativo");
 }
 
-function criarItemMomento(foto, prefixoArquivo, indice) {
+function criarItemMomento(foto, indice) {
   var item = document.createElement("button");
   item.type = "button";
   item.className = "momentos-item";
   item.innerHTML = '<img src="' + foto.url + '" alt="' + escapeAttr(foto.alt) + '">';
   item.addEventListener("click", function () {
-    abrirZoomFoto(foto.url, prefixoArquivo + "-" + (indice + 1), foto.alt);
+    abrirZoomFoto(foto.url, "momento-" + (indice + 1), foto.alt);
   });
   return item;
 }
 
 function montarMomentos() {
-  var gradeProfs = document.getElementById("momentos-grade-profs");
-  var gradeCampeonato = document.getElementById("momentos-grade-campeonato");
-  gradeProfs.innerHTML = "";
-  gradeCampeonato.innerHTML = "";
+  var grade = document.getElementById("momentos-grade");
+  grade.innerHTML = "";
 
-  MOMENTOS.profs.forEach(function (foto, i) {
-    gradeProfs.appendChild(criarItemMomento(foto, "prof", i));
-  });
-  MOMENTOS.campeonato.forEach(function (foto, i) {
-    gradeCampeonato.appendChild(criarItemMomento(foto, "momento", i));
+  var todasAsFotos = MOMENTOS.profs.concat(MOMENTOS.campeonato);
+  todasAsFotos.forEach(function (foto, i) {
+    grade.appendChild(criarItemMomento(foto, i));
   });
 }
 

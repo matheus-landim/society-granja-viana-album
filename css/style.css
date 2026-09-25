@@ -310,19 +310,11 @@ img { max-width: 100%; display: block; }
   box-shadow: var(--shadow);
   text-align: center;
 }
-.momentos-grupo { margin-top: 1.75rem; }
-.momentos-titulo {
-  font-family: "Bebas Neue", "Poppins", sans-serif;
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #6b6144;
-  margin: 0 0 1rem;
-}
 .momentos-grade {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.8rem;
+  margin-top: 1.5rem;
 }
 @media (min-width: 620px) {
   .momentos-grade { grid-template-columns: repeat(3, 1fr); }
@@ -937,13 +929,15 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
 @media print {
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 8mm;
   }
 
-  body {
-    background: #fff !important;
+  /* Mantém as cores e o fundo do site na impressão (a maioria dos
+     navegadores esconde imagens/cores de fundo por padrão ao imprimir). */
+  html, body, .pagina, .pagina * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
-  body::before, body::after { display: none !important; }
 
   .topbar, .barra-navegacao, .tela-inicio, .tela-momentos, .site-footer, .cookie-aviso,
   #loading-overlay, .seta, .pagina-acoes, .grid-dica,
@@ -952,19 +946,12 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
   }
 
   .pagina {
-    margin: 0;
-    padding: 0;
-    border: none;
-    outline: none;
-    box-shadow: none;
+    margin: 0 auto;
     max-width: 100%;
-    background: #fff;
   }
-  .pagina::before { display: none; }
   .pagina.carregando { opacity: 1; }
 
   .figurinha-card {
-    box-shadow: none;
     break-inside: avoid;
   }
   .figurinha-card::after { display: none; }
