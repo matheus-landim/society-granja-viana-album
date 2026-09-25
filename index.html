@@ -19,13 +19,13 @@
 </div>
 
 <header class="topbar">
-  <div class="brand">
+  <a class="brand" href="#inicio">
     <img class="brand-badge" src="assets/logo-gremio-cotia.png" alt="Escola de Futebol Grêmio Cotia">
     <div>
       <strong>Society Granja Viana</strong>
       <span>Álbum do Campeonato Interno</span>
     </div>
-  </div>
+  </a>
 
   <div class="auth-area">
     <button id="btn-login" type="button" class="btn btn-outline">Entrar</button>
@@ -35,7 +35,21 @@
 
 <nav class="country-flags" id="country-flags" aria-label="Selecionar país"></nav>
 
-<main id="pagina" class="pagina">
+<section id="tela-inicio" class="tela-inicio">
+  <h1 class="tela-inicio-titulo">Escolha uma seleção</h1>
+  <p class="tela-inicio-texto">
+    Álbum de figurinhas digital do Campeonato Interno da Escola de Futebol
+    Grêmio Cotia. Toque na bandeira do país para abrir o álbum daquela
+    seleção.
+  </p>
+  <div class="tela-inicio-instrucoes">
+    <p><span aria-hidden="true">🔍</span> Dentro do álbum, toque numa figurinha pra ver a foto ampliada.</p>
+    <p><span aria-hidden="true">⬇</span> No zoom, toque em "Baixar figurinha" pra guardar a foto.</p>
+  </div>
+  <div class="tela-inicio-bandeiras" id="tela-inicio-bandeiras"></div>
+</section>
+
+<main id="pagina" class="pagina" hidden>
   <button type="button" id="prev-country" class="seta seta-prev" aria-label="País anterior">‹</button>
   <button type="button" id="next-country" class="seta seta-next" aria-label="Próximo país">›</button>
 

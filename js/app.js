@@ -30,16 +30,67 @@ function montarSeletorPaises() {
   });
 }
 
+function montarBandeirasInicio() {
+  var container = document.getElementById("tela-inicio-bandeiras");
+  container.innerHTML = "";
+
+  COUNTRIES.forEach(function (c) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tela-inicio-bandeira-item";
+    btn.innerHTML =
+      '<img class="tela-inicio-bandeira-img" src="' + bandeiraUrl(c) + '" alt="Bandeira de ' + c.nome + '">' +
+      '<span class="tela-inicio-bandeira-nome">' + c.nome + "</span>";
+    btn.addEventListener("click", function () {
+      irParaPais(c.id);
+    });
+    container.appendChild(btn);
+  });
+}
+
 function irParaPais(id) {
   window.location.hash = id;
 }
 
-function paisAtualIndex() {
-  var id = (window.location.hash || "#brasil").replace("#", "");
-  var idx = COUNTRIES.findIndex(function (c) {
+// Sem hash (ou hash de um país que não existe) = tela inicial.
+function paisPorHash() {
+  var id = (window.location.hash || "").replace("#", "");
+  var country = COUNTRIES.find(function (c) {
     return c.id === id;
   });
+  return country ? country.id : null;
+}
+
+function paisAtualIndex() {
+  var idx = COUNTRIES.findIndex(function (c) {
+    return c.id === paisPorHash();
+  });
   return idx === -1 ? 0 : idx;
+}
+
+function mostrarTelaInicio() {
+  document.getElementById("tela-inicio").hidden = false;
+  document.getElementById("pagina").hidden = true;
+  document.title = "Álbum Society Granja Viana";
+  document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
+    btn.classList.remove("ativo");
+  });
+}
+
+function mostrarPaginaPais() {
+  document.getElementById("tela-inicio").hidden = true;
+  document.getElementById("pagina").hidden = false;
+}
+
+function roteador() {
+  var countryId = paisPorHash();
+  if (countryId) {
+    mostrarPaginaPais();
+    carregarEExibir(countryId);
+  } else {
+    mostrarTelaInicio();
+    esconderTelaCarregamento();
+  }
 }
 
 function aplicarTemaPagina(country) {
@@ -289,16 +340,12 @@ function initEventosPagina() {
     });
   });
 
-  window.addEventListener("hashchange", function () {
-    var idx = paisAtualIndex();
-    carregarEExibir(COUNTRIES[idx].id);
-  });
+  window.addEventListener("hashchange", roteador);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   montarSeletorPaises();
+  montarBandeirasInicio();
   initEventosPagina();
-  if (!window.location.hash) window.location.hash = "brasil";
-  var idx = paisAtualIndex();
-  carregarEExibir(COUNTRIES[idx].id);
+  roteador();
 });
