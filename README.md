@@ -5,6 +5,11 @@ temática para cada país/seleção: Alemanha, Argentina, Bélgica, Brasil,
 Colômbia, Croácia, Espanha, Estados Unidos, França, Holanda, Inglaterra,
 Japão, México, Portugal, Suécia e Uruguai.
 
+- **Tela inicial**: ao abrir o site (sem nenhum país selecionado na URL),
+  aparece uma tela de boas-vindas com a explicação de como usar o álbum
+  (tocar numa bandeira pra abrir a seleção, tocar numa figurinha pra ver
+  a foto ampliada e baixar) e a grade com a bandeira de cada país. Tocar
+  no logo/nome no topo volta pra essa tela a qualquer momento.
 - **Qualquer pessoa** pode abrir o link e folhear o álbum (setas ◀ ▶ ou
   tocando na bandeira do país desejado, todas visíveis logo abaixo do
   cabeçalho). Uma tela de carregamento com o logo aparece enquanto os

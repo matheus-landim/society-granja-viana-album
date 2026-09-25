@@ -145,6 +145,8 @@ img { max-width: 100%; display: block; }
   gap: 0.6rem;
   color: #fff;
   white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
 }
 .brand-badge {
   width: 2.3rem;
@@ -194,6 +196,79 @@ img { max-width: 100%; display: block; }
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent);
   transform: scale(1.08);
+}
+
+/* ---------- Tela inicial ---------- */
+.tela-inicio {
+  max-width: 720px;
+  margin: 1.75rem auto;
+  padding: 2rem 1.4rem 2.4rem;
+  background: var(--paper-card);
+  border-radius: 18px;
+  border: 6px solid #fffdf6;
+  outline: 2px solid rgba(0,0,0,0.18);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.tela-inicio-titulo {
+  font-family: "Bebas Neue", "Poppins", sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.6rem;
+  color: var(--ink);
+}
+.tela-inicio-texto {
+  max-width: 520px;
+  margin: 0 auto 1.4rem;
+  color: var(--ink);
+  line-height: 1.55;
+}
+.tela-inicio-instrucoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 420px;
+  margin: 0 auto 1.8rem;
+  padding: 1rem 1.2rem;
+  background: rgba(0,0,0,0.04);
+  border-radius: 12px;
+  text-align: left;
+}
+.tela-inicio-instrucoes p { margin: 0; font-size: 0.88rem; color: var(--ink); }
+.tela-inicio-instrucoes span { margin-right: 0.4rem; }
+.tela-inicio-bandeiras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+}
+.tela-inicio-bandeira-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 5.5rem;
+  padding: 0.7rem 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.tela-inicio-bandeira-item:hover { background: rgba(0,0,0,0.05); transform: translateY(-2px); }
+.tela-inicio-bandeira-img {
+  width: 3.4rem;
+  height: 2.4rem;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 2px solid var(--line);
+}
+.tela-inicio-bandeira-nome {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.2;
 }
 
 /* ---------- Página do álbum (a "lâmina" do álbum sobre o gramado) ---------- */
