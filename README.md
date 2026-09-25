@@ -19,17 +19,21 @@ Japão, México, Portugal, Suécia e Uruguai.
   do Storage e o registro), trocar a foto de capa da página, e adicionar
   mais jogadores (card "+ Adicionar jogador" no fim da grade) quando o
   time tiver mais de 11 jogadores.
-- **Baixar imagens**: qualquer visitante pode tocar numa figurinha para
-  baixar a foto daquele aluno (não tem opção de baixar a seleção
-  inteira). Antes de baixar, aparece um aviso de confirmação. A imagem
-  exportada sai como um card estilo Instagram: logo da Escola de Futebol
-  Grêmio Cotia + `@gremio_cotia` no topo e a foto inteira (nunca cortada,
-  nem o rosto) preenchendo o resto do quadro — tudo gravado na própria
-  imagem.
+- **Ver e baixar imagens**: qualquer visitante pode tocar numa figurinha
+  para abrir a foto daquele aluno ampliada (zoom), com um botão "Baixar
+  imagem" dentro do próprio zoom (não tem opção de baixar a seleção
+  inteira). A imagem exportada sai como um card estilo Instagram: logo
+  da Escola de Futebol Grêmio Cotia + `@gremio_cotia` no topo e a foto
+  inteira (nunca cortada, nem o rosto) preenchendo o resto do quadro —
+  tudo gravado na própria imagem.
 - **Patrocinadores**: cada seleção tem o seu próprio patrocinador (como
   na tradição do campeonato: Portugal/Fortland, Croácia/J Design,
   Bélgica/Amplios, Brasil/Society Granja Viana, etc), mostrado no fim da
   página. Fica escondido nas seleções sem patrocinador cadastrado.
+- **Termos de Uso e Política de Privacidade**: páginas próprias
+  (`termos.html` e `privacidade.html`, linkadas no rodapé) e um aviso de
+  cookies que aparece na primeira visita, avisando que navegar no site
+  implica aceitar o uso de cookies.
 
 Site estático (HTML/CSS/JS puro, sem build). O armazenamento das fotos e
 dos dados é feito no **Supabase** (Auth + Postgres + Storage), que tem
@@ -136,9 +140,12 @@ js/supabase-config.js    Config do Supabase (preencher, passo 4)
 js/countries.js          Lista dos 16 países + cores de cada bandeira
 js/auth.js               Login/logout (usuário/senha fixo, sem cadastro)
 js/album.js               Leitura/escrita das figurinhas e fotos no Supabase
-js/export.js               Exportação em card estilo Instagram (logo, @handle) + confirmação
+js/export.js               Zoom da foto + exportação em card estilo Instagram (logo, @handle)
+js/cookies.js               Aviso de cookies (mostra uma vez, guarda a escolha no localStorage)
 assets/logo-gremio-cotia.png  Logo usado no topo do card exportado
 js/app.js                   Navegação entre países e renderização da página atual
+termos.html                 Termos de Uso
+privacidade.html            Política de Privacidade e cookies
 supabase/schema.sql                        Script único: tabelas + bucket + regras + as 11 figurinhas de cada país
 supabase/migracao-11-jogadores.sql          Migração para quem já tinha rodado uma versão antiga do schema
 supabase/patrocinadores.sql                 Cria a tabela de patrocinadores (passo 2.3)

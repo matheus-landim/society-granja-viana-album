@@ -671,6 +671,99 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
 }
 .patrocinador-instagram svg { width: 0.85rem; height: 0.85rem; }
 
+/* ---------- Zoom da foto ---------- */
+.foto-zoom-modal {
+  border: none;
+  border-radius: 14px;
+  padding: 1.2rem;
+  max-width: min(520px, 92vw);
+  max-height: 90vh;
+  background: var(--paper-card);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.foto-zoom-modal::backdrop { background: rgba(0,0,0,0.75); }
+.foto-zoom-img {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f2f2f2;
+}
+.foto-zoom-fechar {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.foto-zoom-baixar {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* ---------- Aviso de cookies ---------- */
+.cookie-aviso {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1.2rem;
+  background: var(--ink);
+  color: #f2e9c9;
+  font-size: 0.82rem;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.3);
+}
+.cookie-aviso p { margin: 0; max-width: 640px; }
+.cookie-aviso a { color: var(--accent); }
+
+/* ---------- Páginas de termos/privacidade ---------- */
+.legal-page {
+  max-width: 680px;
+  margin: 2rem auto 3rem;
+  padding: 2rem 1.6rem;
+  background: var(--paper-card);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  line-height: 1.6;
+}
+.legal-page h1 {
+  font-family: "Bebas Neue", "Poppins", sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.3rem;
+}
+.legal-page h2 {
+  font-family: "Bebas Neue", "Poppins", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+  margin: 1.6rem 0 0.4rem;
+  color: var(--accent-dark);
+}
+.legal-page p, .legal-page li { font-size: 0.92rem; }
+.legal-page ul { padding-left: 1.2rem; }
+.legal-atualizado { color: #6b6144; font-size: 0.82rem; margin-bottom: 1.2rem; }
+.legal-veja-tambem { margin-top: 1.8rem; font-size: 0.85rem; }
+.legal-page a { color: var(--accent-dark); }
+
 /* ---------- Footer ---------- */
 .site-footer {
   text-align: center;
@@ -678,6 +771,8 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
   color: #f2e9c9;
   font-size: 0.8rem;
 }
+.site-footer-legal { margin-top: 0.4rem; }
+.site-footer-legal a { color: #f2e9c9; text-decoration: underline; }
 
 @media (max-width: 640px) {
   .topbar { justify-content: center; }
