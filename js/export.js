@@ -17,7 +17,7 @@ var logoPronto = (function () {
 })();
 
 // Guarda a foto que está aberta no modal de zoom, pra saber o que baixar
-// quando a pessoa clicar em "Baixar imagem".
+// quando a pessoa clicar em "Baixar figurinha".
 var zoomAtual = null;
 
 // Abre o modal de zoom com a foto do jogador em tamanho grande.
