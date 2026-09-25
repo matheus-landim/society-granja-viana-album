@@ -88,6 +88,7 @@ function criarCardFigurinha(fig, countryId, countryNome) {
       '<img src="' + (fig.fotoUrl || placeholderSVG) + '" alt="Foto do jogador">' +
       '<span class="figurinha-baixar-dica" aria-hidden="true">⬇</span>' +
       '<label class="somente-edicao upload-btn upload-btn-sm">📷<input type="file" accept="image/*" class="input-foto-figurinha" hidden></label>' +
+      '<button type="button" class="somente-edicao figurinha-excluir" title="Excluir jogador">🗑</button>' +
     "</div>" +
     '<div class="figurinha-info">' +
       '<span class="figurinha-numero-tag">Nº ' + escapeAttr(fig.numero) + "</span>" +
@@ -111,6 +112,15 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   card.querySelector(".figurinha-nome").addEventListener("change", function (e) {
     fig.nome = e.target.value;
     editarCampoFigurinha(fig.id, "nome", fig.nome);
+  });
+
+  card.querySelector(".figurinha-excluir").addEventListener("click", function () {
+    if (!confirm("Excluir esse jogador? A foto e os dados dele serão apagados.")) return;
+    var pagina = window.paginaAtual;
+    excluirFigurinha(fig.id, fig.fotoPath).then(function () {
+      pagina.figurinhas = pagina.figurinhas.filter(function (f) { return f.id !== fig.id; });
+      renderGrid(pagina, countryId, countryNome);
+    });
   });
 
   var numeroInput = card.querySelector(".figurinha-numero-input");
