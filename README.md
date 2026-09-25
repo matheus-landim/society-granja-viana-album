@@ -15,9 +15,10 @@ Japão, México, Portugal, Suécia e Uruguai.
   de figurinhas numeradas.
 - **Login único** (usuário/senha fixos, sem tela de cadastro) libera o modo
   de edição: enviar/trocar a foto de cada jogador, editar nome e número
-  da camisa, trocar a foto de capa da página, e adicionar mais jogadores
-  (card "+ Adicionar jogador" no fim da grade) quando o time tiver mais
-  de 11 jogadores.
+  da camisa, excluir um jogador (ícone 🗑 no canto da foto — apaga a foto
+  do Storage e o registro), trocar a foto de capa da página, e adicionar
+  mais jogadores (card "+ Adicionar jogador" no fim da grade) quando o
+  time tiver mais de 11 jogadores.
 - **Baixar imagens**: qualquer visitante pode tocar numa figurinha para
   baixar a foto daquele aluno (não tem opção de baixar a seleção
   inteira). Antes de baixar, aparece um aviso de confirmação. A imagem

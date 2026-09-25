@@ -69,6 +69,13 @@ function enviarFotoFigurinha(countryId, figId, file) {
     });
 }
 
+function excluirFigurinha(figId, fotoPath) {
+  var removerFoto = fotoPath ? sbClient.storage.from("fotos").remove([fotoPath]) : Promise.resolve();
+  return removerFoto.then(function () {
+    return sbClient.from("figurinhas").delete().eq("id", figId);
+  });
+}
+
 function adicionarFigurinha(countryId, ordem) {
   return sbClient
     .from("figurinhas")
