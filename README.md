@@ -37,9 +37,9 @@ Japão, México, Portugal, Suécia e Uruguai.
   destino). Sai só o conteúdo da página — sem menus, botões ou aviso de
   cookies.
 - **Aba Momentos**: um botão fixo "📸 Momentos" ao lado das bandeiras, em
-  qualquer página, abre uma galeria com fotos da comissão técnica
-  (professores/árbitros) e dos momentos do campeonato. Toque numa foto
-  pra ver ampliada e baixar, igual às figurinhas.
+  qualquer página, abre uma galeria única com fotos do campeonato (jogos,
+  comissão técnica, bastidores). Toque numa foto pra ver ampliada e
+  baixar, igual às figurinhas.
 - **Patrocinadores**: cada seleção tem o seu próprio patrocinador (como
   na tradição do campeonato: Portugal/Fortland, Croácia/J Design,
   Bélgica/Amplios, Brasil/Society Granja Viana, etc), mostrado no fim da
