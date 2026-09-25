@@ -16,35 +16,36 @@ var logoPronto = (function () {
   });
 })();
 
-// Mostra o modal de confirmação e resolve true/false conforme o botão clicado.
-function confirmarDownload() {
-  return new Promise(function (resolve) {
-    var modal = document.getElementById("confirmar-download-modal");
-    if (!modal) { resolve(true); return; }
+// Guarda a foto que está aberta no modal de zoom, pra saber o que baixar
+// quando a pessoa clicar em "Baixar imagem".
+var zoomAtual = null;
 
-    var btnSim = document.getElementById("btn-confirmar-download");
-    var btnNao = document.getElementById("btn-cancelar-download");
-    var resolvido = false;
-
-    function finalizar(valor) {
-      if (resolvido) return;
-      resolvido = true;
-      btnSim.removeEventListener("click", aoConfirmar);
-      btnNao.removeEventListener("click", aoCancelar);
-      modal.removeEventListener("close", aoFechar);
-      modal.close();
-      resolve(valor);
-    }
-    function aoConfirmar() { finalizar(true); }
-    function aoCancelar() { finalizar(false); }
-    function aoFechar() { finalizar(false); }
-
-    btnSim.addEventListener("click", aoConfirmar);
-    btnNao.addEventListener("click", aoCancelar);
-    modal.addEventListener("close", aoFechar);
-    modal.showModal();
-  });
+// Abre o modal de zoom com a foto do jogador em tamanho grande.
+function abrirZoomFoto(fotoUrl, countryNome, nomeJogador) {
+  var modal = document.getElementById("foto-zoom-modal");
+  var img = document.getElementById("foto-zoom-img");
+  if (!modal || !img) return;
+  zoomAtual = { fotoUrl: fotoUrl, countryNome: countryNome, nomeJogador: nomeJogador };
+  img.src = fotoUrl;
+  img.alt = "Foto de " + (nomeJogador || "jogador");
+  modal.showModal();
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  var modal = document.getElementById("foto-zoom-modal");
+  if (!modal) return;
+
+  document.getElementById("btn-fechar-zoom").addEventListener("click", function () {
+    modal.close();
+  });
+
+  document.getElementById("btn-baixar-zoom").addEventListener("click", function () {
+    if (!zoomAtual) return;
+    carregarImagem(zoomAtual.fotoUrl).then(function (img) {
+      baixarCanvas(img, "figurinha-" + slugify(zoomAtual.countryNome) + "-" + slugify(zoomAtual.nomeJogador) + ".png");
+    });
+  });
+});
 
 // Desenha uma imagem "cover" (preenche todo o retângulo, cortando o excesso).
 // Só usado pra coisas que não têm rosto/conteúdo importante nas bordas (o logo).
@@ -181,16 +182,4 @@ function slugify(texto) {
     .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "") || "figurinha";
-}
-
-// Exporta só a foto real do jogador (sem a moldura/inputs do card), igual
-// a um post do Instagram: logo + @gremio_cotia no topo, foto inteira
-// (nunca cortada) embaixo.
-function exportarFigurinha(fotoUrl, countryNome, nomeJogador) {
-  confirmarDownload().then(function (ok) {
-    if (!ok) return;
-    carregarImagem(fotoUrl).then(function (img) {
-      baixarCanvas(img, "figurinha-" + slugify(countryNome) + "-" + slugify(nomeJogador) + ".png");
-    });
-  });
 }

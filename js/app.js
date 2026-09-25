@@ -86,7 +86,7 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   card.innerHTML =
     '<div class="figurinha-foto">' +
       '<img src="' + (fig.fotoUrl || placeholderSVG) + '" alt="Foto do jogador">' +
-      '<span class="figurinha-baixar-dica" aria-hidden="true">⬇</span>' +
+      '<span class="figurinha-baixar-dica" aria-hidden="true">🔍</span>' +
       '<label class="somente-edicao upload-btn upload-btn-sm">📷<input type="file" accept="image/*" class="input-foto-figurinha" hidden></label>' +
       '<button type="button" class="somente-edicao figurinha-excluir" title="Excluir jogador">🗑</button>' +
     "</div>" +
@@ -132,11 +132,12 @@ function criarCardFigurinha(fig, countryId, countryNome) {
     });
   }
 
-  // Clique na figurinha (fora dos campos de edição) baixa a foto do jogador.
+  // Clique na figurinha (fora dos campos de edição) amplia a foto do jogador,
+  // com a opção de baixar dentro do zoom.
   card.addEventListener("click", function (e) {
     if (e.target.closest(".somente-edicao") || e.target.tagName === "INPUT") return;
     var nomeAtual = card.querySelector(".figurinha-nome").value || "jogador";
-    exportarFigurinha(fig.fotoUrl || placeholderSVG, countryNome, nomeAtual);
+    abrirZoomFoto(fig.fotoUrl || placeholderSVG, countryNome, nomeAtual);
   });
 
   return card;

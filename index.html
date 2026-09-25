@@ -69,7 +69,7 @@
     </p>
   </section>
 
-  <p class="grid-dica">Toque numa figurinha para baixar a foto do jogador.</p>
+  <p class="grid-dica">Toque numa figurinha para ampliar a foto e baixar.</p>
   <section class="grid-figurinhas" id="grid-figurinhas" aria-label="Figurinhas dos jogadores"></section>
 </main>
 
@@ -92,20 +92,23 @@
   </form>
 </dialog>
 
-<dialog id="confirmar-download-modal" class="login-modal">
-  <div class="login-form">
-    <h2>Baixar imagem</h2>
-    <p>Você deseja baixar a imagem?</p>
-    <div class="login-form-acoes">
-      <button type="button" id="btn-cancelar-download" class="btn btn-ghost">Cancelar</button>
-      <button type="button" id="btn-confirmar-download" class="btn btn-primary">Baixar</button>
-    </div>
-  </div>
+<dialog id="foto-zoom-modal" class="foto-zoom-modal">
+  <button type="button" id="btn-fechar-zoom" class="foto-zoom-fechar" aria-label="Fechar">×</button>
+  <img id="foto-zoom-img" class="foto-zoom-img" alt="Foto ampliada do jogador">
+  <button type="button" id="btn-baixar-zoom" class="btn btn-primary foto-zoom-baixar">⬇ Baixar imagem</button>
 </dialog>
 
 <footer class="site-footer">
   <p>Society Granja Viana · Álbum de figurinhas do campeonato interno</p>
+  <p class="site-footer-legal">
+    <a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Política de Privacidade</a>
+  </p>
 </footer>
+
+<div id="cookie-aviso" class="cookie-aviso" hidden>
+  <p>Este site usa cookies para funcionar melhor. Ao continuar navegando, você aceita a nossa <a href="privacidade.html">Política de Privacidade</a>.</p>
+  <button type="button" id="btn-aceitar-cookies" class="btn btn-primary">Entendi</button>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -115,5 +118,6 @@
 <script src="js/export.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
+<script src="js/cookies.js"></script>
 </body>
 </html>
