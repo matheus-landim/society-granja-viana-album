@@ -71,18 +71,64 @@ function paisAtualIndex() {
 function mostrarTelaInicio() {
   document.getElementById("tela-inicio").hidden = false;
   document.getElementById("pagina").hidden = true;
+  document.getElementById("tela-momentos").hidden = true;
   document.title = "Álbum Society Granja Viana";
   document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
     btn.classList.remove("ativo");
   });
+  document.getElementById("btn-momentos").classList.remove("ativo");
 }
 
 function mostrarPaginaPais() {
   document.getElementById("tela-inicio").hidden = true;
   document.getElementById("pagina").hidden = false;
+  document.getElementById("tela-momentos").hidden = true;
+  document.getElementById("btn-momentos").classList.remove("ativo");
+}
+
+function criarItemMomento(foto, prefixoArquivo, indice) {
+  var item = document.createElement("button");
+  item.type = "button";
+  item.className = "momentos-item";
+  item.innerHTML = '<img src="' + foto.url + '" alt="' + escapeAttr(foto.alt) + '">';
+  item.addEventListener("click", function () {
+    abrirZoomFoto(foto.url, prefixoArquivo + "-" + (indice + 1), foto.alt);
+  });
+  return item;
+}
+
+function montarMomentos() {
+  var gradeProfs = document.getElementById("momentos-grade-profs");
+  var gradeCampeonato = document.getElementById("momentos-grade-campeonato");
+  gradeProfs.innerHTML = "";
+  gradeCampeonato.innerHTML = "";
+
+  MOMENTOS.profs.forEach(function (foto, i) {
+    gradeProfs.appendChild(criarItemMomento(foto, "prof", i));
+  });
+  MOMENTOS.campeonato.forEach(function (foto, i) {
+    gradeCampeonato.appendChild(criarItemMomento(foto, "momento", i));
+  });
+}
+
+function mostrarTelaMomentos() {
+  document.getElementById("tela-inicio").hidden = true;
+  document.getElementById("pagina").hidden = true;
+  document.getElementById("tela-momentos").hidden = false;
+  document.title = "Momentos — Álbum Society Granja Viana";
+  document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
+    btn.classList.remove("ativo");
+  });
+  document.getElementById("btn-momentos").classList.add("ativo");
 }
 
 function roteador() {
+  var hash = (window.location.hash || "").replace("#", "");
+  if (hash === "momentos") {
+    mostrarTelaMomentos();
+    esconderTelaCarregamento();
+    return;
+  }
   var countryId = paisPorHash();
   if (countryId) {
     mostrarPaginaPais();
@@ -188,7 +234,8 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   card.addEventListener("click", function (e) {
     if (e.target.closest(".somente-edicao") || e.target.tagName === "INPUT") return;
     var nomeAtual = card.querySelector(".figurinha-nome").value || "jogador";
-    abrirZoomFoto(fig.fotoUrl || placeholderSVG, countryNome, nomeAtual);
+    var nomeArquivo = "figurinha-" + slugify(countryNome) + "-" + slugify(nomeAtual);
+    abrirZoomFoto(fig.fotoUrl || placeholderSVG, nomeArquivo, "Foto de " + nomeAtual);
   });
 
   return card;
@@ -321,6 +368,10 @@ function initEventosPagina() {
     window.print();
   });
 
+  document.getElementById("btn-momentos").addEventListener("click", function () {
+    irParaPais("momentos");
+  });
+
   document.getElementById("prev-country").addEventListener("click", function () {
     var idx = paisAtualIndex();
     var novo = (idx - 1 + COUNTRIES.length) % COUNTRIES.length;
@@ -350,6 +401,7 @@ function initEventosPagina() {
 document.addEventListener("DOMContentLoaded", function () {
   montarSeletorPaises();
   montarBandeirasInicio();
+  montarMomentos();
   initEventosPagina();
   roteador();
 });

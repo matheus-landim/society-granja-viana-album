@@ -36,6 +36,10 @@ Japão, México, Portugal, Suécia e Uruguai.
   formatada pra caber numa folha A4 (é só escolher "Salvar como PDF" no
   destino). Sai só o conteúdo da página — sem menus, botões ou aviso de
   cookies.
+- **Aba Momentos**: um botão fixo "📸 Momentos" ao lado das bandeiras, em
+  qualquer página, abre uma galeria com fotos da comissão técnica
+  (professores/árbitros) e dos momentos do campeonato. Toque numa foto
+  pra ver ampliada e baixar, igual às figurinhas.
 - **Patrocinadores**: cada seleção tem o seu próprio patrocinador (como
   na tradição do campeonato: Portugal/Fortland, Croácia/J Design,
   Bélgica/Amplios, Brasil/Society Granja Viana, etc), mostrado no fim da
@@ -152,6 +156,7 @@ js/auth.js               Login/logout (usuário/senha fixo, sem cadastro)
 js/album.js               Leitura/escrita das figurinhas e fotos no Supabase
 js/export.js               Zoom da foto + exportação em card estilo Instagram (logo, @handle)
 js/cookies.js               Aviso de cookies (mostra uma vez, guarda a escolha no localStorage)
+js/momentos.js               Fotos da aba Momentos (comissão técnica + momentos do campeonato)
 assets/logo-gremio-cotia.png  Logo usado no topo do card exportado
 js/app.js                   Navegação entre países e renderização da página atual
 termos.html                 Termos de Uso
@@ -182,3 +187,7 @@ supabase/patrocinador-por-pais.sql          Um patrocinador por seleção, em ve
   Table Editor (colunas `country_id` — o id do país, ex: `portugal` —,
   `nome`, `link`, `logo_url` e `ordem`). Cada `country_id` só pode
   aparecer uma vez (um patrocinador por seleção).
+- **Adicionar/trocar fotos da aba Momentos**: também não tem tela de
+  edição — suba a foto em Supabase > Storage > bucket `fotos` > pasta
+  `momentos/`, pegue a URL pública e adicione (ou troque) uma entrada em
+  `MOMENTOS.profs` ou `MOMENTOS.campeonato`, no arquivo `js/momentos.js`.

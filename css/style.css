@@ -169,14 +169,41 @@ img { max-width: 100%; display: block; }
 
 /* Fileira de bandeiras: todos os países visíveis de uma vez, sem
    esconder nada atrás de menu e sem virar uma barra de scroll. */
+.barra-navegacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(0, 0, 0, 0.18);
+  border-bottom: 3px solid var(--accent);
+}
 .country-flags {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.6rem 0.8rem;
-  background: rgba(0, 0, 0, 0.18);
-  border-bottom: 3px solid var(--accent);
+}
+.btn-momentos {
+  flex: none;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  padding: 0.35em 0.8em;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.35);
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.btn-momentos:hover { border-color: rgba(255,255,255,0.7); }
+.btn-momentos.ativo {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 .country-flag-btn {
   width: 2.2rem;
@@ -270,6 +297,51 @@ img { max-width: 100%; display: block; }
   text-align: center;
   line-height: 1.2;
 }
+
+/* ---------- Momentos ---------- */
+.tela-momentos {
+  max-width: 900px;
+  margin: 1.75rem auto;
+  padding: 2rem 1.4rem 2.4rem;
+  background: var(--paper-card);
+  border-radius: 18px;
+  border: 6px solid #fffdf6;
+  outline: 2px solid rgba(0,0,0,0.18);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.momentos-grupo { margin-top: 1.75rem; }
+.momentos-titulo {
+  font-family: "Bebas Neue", "Poppins", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b6144;
+  margin: 0 0 1rem;
+}
+.momentos-grade {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+@media (min-width: 620px) {
+  .momentos-grade { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 900px) {
+  .momentos-grade { grid-template-columns: repeat(4, 1fr); }
+}
+.momentos-item {
+  padding: 0;
+  border: 3px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #e7e7ef;
+  aspect-ratio: 4 / 3;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.momentos-item:hover { transform: translateY(-2px); border-color: var(--accent-dark); }
+.momentos-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* ---------- Página do álbum (a "lâmina" do álbum sobre o gramado) ---------- */
 .pagina {
@@ -873,7 +945,7 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
   }
   body::before, body::after { display: none !important; }
 
-  .topbar, .country-flags, .tela-inicio, .site-footer, .cookie-aviso,
+  .topbar, .barra-navegacao, .tela-inicio, .tela-momentos, .site-footer, .cookie-aviso,
   #loading-overlay, .seta, .pagina-acoes, .grid-dica,
   .somente-edicao, .figurinha-baixar-dica, .patrocinador-instagram {
     display: none !important;

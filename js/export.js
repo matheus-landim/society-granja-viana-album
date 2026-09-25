@@ -20,14 +20,15 @@ var logoPronto = (function () {
 // quando a pessoa clicar em "Baixar figurinha".
 var zoomAtual = null;
 
-// Abre o modal de zoom com a foto do jogador em tamanho grande.
-function abrirZoomFoto(fotoUrl, countryNome, nomeJogador) {
+// Abre o modal de zoom com a foto em tamanho grande. "nomeArquivo" já vem
+// pronto (sem espaço/acento) pra virar o nome do arquivo baixado.
+function abrirZoomFoto(fotoUrl, nomeArquivo, textoAlt) {
   var modal = document.getElementById("foto-zoom-modal");
   var img = document.getElementById("foto-zoom-img");
   if (!modal || !img) return;
-  zoomAtual = { fotoUrl: fotoUrl, countryNome: countryNome, nomeJogador: nomeJogador };
+  zoomAtual = { fotoUrl: fotoUrl, nomeArquivo: nomeArquivo };
   img.src = fotoUrl;
-  img.alt = "Foto de " + (nomeJogador || "jogador");
+  img.alt = textoAlt || "Foto ampliada";
   modal.showModal();
 }
 
@@ -42,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btn-baixar-zoom").addEventListener("click", function () {
     if (!zoomAtual) return;
     carregarImagem(zoomAtual.fotoUrl).then(function (img) {
-      baixarCanvas(img, "figurinha-" + slugify(zoomAtual.countryNome) + "-" + slugify(zoomAtual.nomeJogador) + ".png");
+      baixarCanvas(img, zoomAtual.nomeArquivo + ".png");
     });
   });
 });
