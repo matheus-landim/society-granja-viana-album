@@ -322,6 +322,12 @@ img { max-width: 100%; display: block; }
 @media (min-width: 900px) {
   .momentos-grade { grid-template-columns: repeat(4, 1fr); }
 }
+.momentos-credito {
+  margin-top: 2.2rem;
+  font-size: 0.85rem;
+  color: var(--ink-light, #7a7368);
+  font-style: italic;
+}
 .momentos-item {
   padding: 0;
   border: 3px solid var(--line);
