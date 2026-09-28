@@ -359,9 +359,34 @@ function carregarEExibir(countryId) {
     });
 }
 
+// Se o usuário clicar em "Baixar PDF" logo depois de trocar de seleção, as
+// fotos daquela página ainda podem estar carregando (vêm do Supabase pela
+// rede) — sem esperar, o PDF sai com figurinhas e foto do time em branco,
+// como se só uma parte da página tivesse sido salva.
+function aguardarFotosCarregarem(container) {
+  var imagens = Array.prototype.slice.call(container.querySelectorAll("img"));
+  var promessas = imagens.map(function (img) {
+    if (img.complete) return Promise.resolve();
+    return new Promise(function (resolve) {
+      img.addEventListener("load", resolve, { once: true });
+      img.addEventListener("error", resolve, { once: true });
+    });
+  });
+  var tempoLimite = new Promise(function (resolve) { setTimeout(resolve, 4000); });
+  return Promise.race([Promise.all(promessas), tempoLimite]);
+}
+
 function initEventosPagina() {
   document.getElementById("btn-baixar-pdf").addEventListener("click", function () {
-    window.print();
+    var botao = this;
+    var textoOriginal = botao.textContent;
+    botao.disabled = true;
+    botao.textContent = "Preparando PDF…";
+    aguardarFotosCarregarem(document.getElementById("pagina")).then(function () {
+      window.print();
+      botao.disabled = false;
+      botao.textContent = textoOriginal;
+    });
   });
 
   document.getElementById("btn-momentos").addEventListener("click", function () {
