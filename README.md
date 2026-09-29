@@ -40,6 +40,10 @@ Japão, México, Portugal, Suécia e Uruguai.
   qualquer página, abre uma galeria única com fotos do campeonato (jogos,
   comissão técnica, bastidores). Toque numa foto pra ver ampliada e
   baixar, igual às figurinhas.
+- **Aba Resultados**: um botão fixo "🏆 Resultados" ao lado das bandeiras
+  mostra a tabela de todos os jogos do campeonato, rodada a rodada, com a
+  bandeira de cada seleção, o placar (e o placar dos pênaltis, quando
+  houve) e um destaque para o time com vantagem do empate na semifinal.
 - **Patrocinadores**: cada seleção tem o seu próprio patrocinador (como
   na tradição do campeonato: Portugal/Fortland, Croácia/J Design,
   Bélgica/Amplios, Brasil/Society Granja Viana, etc), mostrado no fim da
@@ -157,6 +161,7 @@ js/album.js               Leitura/escrita das figurinhas e fotos no Supabase
 js/export.js               Zoom da foto + exportação em card estilo Instagram (logo, @handle)
 js/cookies.js               Aviso de cookies (mostra uma vez, guarda a escolha no localStorage)
 js/momentos.js               Fotos da aba Momentos (comissão técnica + momentos do campeonato)
+js/resultados.js             Tabela de resultados da aba Resultados (jogos por rodada)
 assets/logo-gremio-cotia.png  Logo usado no topo do card exportado
 js/app.js                   Navegação entre países e renderização da página atual
 termos.html                 Termos de Uso
