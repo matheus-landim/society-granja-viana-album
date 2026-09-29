@@ -72,18 +72,22 @@ function mostrarTelaInicio() {
   document.getElementById("tela-inicio").hidden = false;
   document.getElementById("pagina").hidden = true;
   document.getElementById("tela-momentos").hidden = true;
+  document.getElementById("tela-resultados").hidden = true;
   document.title = "Álbum Society Granja Viana";
   document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
     btn.classList.remove("ativo");
   });
   document.getElementById("btn-momentos").classList.remove("ativo");
+  document.getElementById("btn-resultados").classList.remove("ativo");
 }
 
 function mostrarPaginaPais() {
   document.getElementById("tela-inicio").hidden = true;
   document.getElementById("pagina").hidden = false;
   document.getElementById("tela-momentos").hidden = true;
+  document.getElementById("tela-resultados").hidden = true;
   document.getElementById("btn-momentos").classList.remove("ativo");
+  document.getElementById("btn-resultados").classList.remove("ativo");
 }
 
 function criarItemMomento(foto, indice) {
@@ -111,17 +115,90 @@ function mostrarTelaMomentos() {
   document.getElementById("tela-inicio").hidden = true;
   document.getElementById("pagina").hidden = true;
   document.getElementById("tela-momentos").hidden = false;
+  document.getElementById("tela-resultados").hidden = true;
   document.title = "Momentos — Álbum Society Granja Viana";
   document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
     btn.classList.remove("ativo");
   });
   document.getElementById("btn-momentos").classList.add("ativo");
+  document.getElementById("btn-resultados").classList.remove("ativo");
+}
+
+function criarLinhaResultado(jogo) {
+  var timeA = getCountry(jogo.timeA);
+  var timeB = getCountry(jogo.timeB);
+  var placarA = jogo.golsA + (jogo.penaltiA != null ? " (" + jogo.penaltiA + ")" : "");
+  var placarB = jogo.golsB + (jogo.penaltiB != null ? " (" + jogo.penaltiB + ")" : "");
+
+  var linha = document.createElement("div");
+  linha.className = "resultado-jogo";
+  linha.innerHTML =
+    '<span class="resultado-hora">' + jogo.hora + "</span>" +
+    '<span class="resultado-time' + (jogo.vantagemA ? " resultado-vantagem" : "") + '">' +
+      '<span class="resultado-nome">' + timeA.nome + "</span>" +
+      '<img class="resultado-bandeira" src="' + bandeiraUrl(timeA) + '" alt="Bandeira de ' + timeA.nome + '">' +
+    "</span>" +
+    '<span class="resultado-placar">' + placarA + " x " + placarB + "</span>" +
+    '<span class="resultado-time resultado-time-b' + (jogo.vantagemB ? " resultado-vantagem" : "") + '">' +
+      '<img class="resultado-bandeira" src="' + bandeiraUrl(timeB) + '" alt="Bandeira de ' + timeB.nome + '">' +
+      '<span class="resultado-nome">' + timeB.nome + "</span>" +
+    "</span>";
+  return linha;
+}
+
+function montarResultados() {
+  var container = document.getElementById("resultados-lista");
+  container.innerHTML = "";
+
+  RESULTADOS.forEach(function (rodada) {
+    var bloco = document.createElement("div");
+    bloco.className = "resultados-rodada";
+
+    var titulo = document.createElement("h2");
+    titulo.className = "resultados-rodada-titulo";
+    titulo.textContent = rodada.rodada + " · " + rodada.data;
+    bloco.appendChild(titulo);
+
+    var jogosContainer = document.createElement("div");
+    jogosContainer.className = "resultados-jogos";
+    rodada.jogos.forEach(function (jogo) {
+      jogosContainer.appendChild(criarLinhaResultado(jogo));
+    });
+    bloco.appendChild(jogosContainer);
+
+    if (rodada.observacao) {
+      var obs = document.createElement("p");
+      obs.className = "resultados-observacao";
+      obs.textContent = "* " + rodada.observacao;
+      bloco.appendChild(obs);
+    }
+
+    container.appendChild(bloco);
+  });
+}
+
+function mostrarTelaResultados() {
+  document.getElementById("tela-inicio").hidden = true;
+  document.getElementById("pagina").hidden = true;
+  document.getElementById("tela-momentos").hidden = true;
+  document.getElementById("tela-resultados").hidden = false;
+  document.title = "Tabela de Resultados — Álbum Society Granja Viana";
+  document.querySelectorAll(".country-flag-btn").forEach(function (btn) {
+    btn.classList.remove("ativo");
+  });
+  document.getElementById("btn-momentos").classList.remove("ativo");
+  document.getElementById("btn-resultados").classList.add("ativo");
 }
 
 function roteador() {
   var hash = (window.location.hash || "").replace("#", "");
   if (hash === "momentos") {
     mostrarTelaMomentos();
+    esconderTelaCarregamento();
+    return;
+  }
+  if (hash === "resultados") {
+    mostrarTelaResultados();
     esconderTelaCarregamento();
     return;
   }
@@ -393,6 +470,10 @@ function initEventosPagina() {
     irParaPais("momentos");
   });
 
+  document.getElementById("btn-resultados").addEventListener("click", function () {
+    irParaPais("resultados");
+  });
+
   document.getElementById("prev-country").addEventListener("click", function () {
     var idx = paisAtualIndex();
     var novo = (idx - 1 + COUNTRIES.length) % COUNTRIES.length;
@@ -423,6 +504,7 @@ document.addEventListener("DOMContentLoaded", function () {
   montarSeletorPaises();
   montarBandeirasInicio();
   montarMomentos();
+  montarResultados();
   initEventosPagina();
   roteador();
 });
