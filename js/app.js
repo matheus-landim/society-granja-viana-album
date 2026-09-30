@@ -280,8 +280,16 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   });
 
   card.querySelector(".figurinha-nome").addEventListener("change", function (e) {
-    fig.nome = e.target.value;
-    editarCampoFigurinha(fig.id, "nome", fig.nome);
+    var valorAnterior = fig.nome;
+    var input = e.target;
+    fig.nome = input.value;
+    editarCampoFigurinha(fig.id, "nome", fig.nome).then(function (res) {
+      if (res.error) {
+        fig.nome = valorAnterior;
+        input.value = valorAnterior;
+        alert("Não consegui salvar o nome. Verifique sua conexão e tente de novo.");
+      }
+    });
   });
 
   card.querySelector(".figurinha-excluir").addEventListener("click", function () {
@@ -296,9 +304,19 @@ function criarCardFigurinha(fig, countryId, countryNome) {
   var numeroInput = card.querySelector(".figurinha-numero-input");
   if (numeroInput) {
     numeroInput.addEventListener("change", function (e) {
-      fig.numero = e.target.value;
-      editarCampoFigurinha(fig.id, "numero", fig.numero);
-      card.querySelector(".figurinha-numero-tag").textContent = "Nº " + fig.numero;
+      var valorAnterior = fig.numero;
+      var input = e.target;
+      fig.numero = input.value;
+      var tag = card.querySelector(".figurinha-numero-tag");
+      tag.textContent = "Nº " + fig.numero;
+      editarCampoFigurinha(fig.id, "numero", fig.numero).then(function (res) {
+        if (res.error) {
+          fig.numero = valorAnterior;
+          input.value = valorAnterior;
+          tag.textContent = "Nº " + valorAnterior;
+          alert("Não consegui salvar o número. Verifique sua conexão e tente de novo.");
+        }
+      });
     });
   }
 
