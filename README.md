@@ -32,10 +32,11 @@ Japão, México, Portugal, Suécia e Uruguai.
   inteira (nunca cortada, nem o rosto) preenchendo o resto do quadro —
   tudo gravado na própria imagem.
 - **Baixar PDF da página**: o botão "🖨️ Baixar PDF da página" (logo abaixo
-  do título de cada seleção) abre a janela de impressão do navegador, já
-  formatada pra caber numa folha A4 (é só escolher "Salvar como PDF" no
-  destino). Sai só o conteúdo da página — sem menus, botões ou aviso de
-  cookies.
+  do título de cada seleção) gera e baixa direto um arquivo PDF de uma
+  folha A4 com o conteúdo daquela seleção (escudo, patrocinador, foto do
+  time e as 11 figurinhas) — sem menus, botões ou aviso de cookies. O PDF
+  é montado a partir de uma captura da própria página (html2canvas +
+  jsPDF), não da função de imprimir do navegador.
 - **Aba Momentos**: um botão fixo "📸 Momentos" ao lado das bandeiras, em
   qualquer página, abre uma galeria única com fotos do campeonato (jogos,
   comissão técnica, bastidores). Toque numa foto pra ver ampliada e
