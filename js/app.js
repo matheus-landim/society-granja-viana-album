@@ -703,12 +703,22 @@ function gerarPdfDaPagina() {
   var country = pagina && getCountry(pagina.countryId);
   if (!pagina || !country) return Promise.reject(new Error("Nenhuma seleção carregada"));
 
-  return gerarImagemSelecao(pagina, country).then(function (canvas) {
-    var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
-    var margem = 8;
-    var larguraMax = pdf.internal.pageSize.getWidth() - margem * 2;
-    var alturaMax = pdf.internal.pageSize.getHeight() - margem * 2;
-    var proporcao = canvas.width / canvas.height;
+  return gerarImagemSelecao(pagina, country).then(function (canvasConteudo) {
+    // Monta uma folha A4 inteira (em pixels) com o campo no fundo de
+    // ponta a ponta, e encaixa o conteúdo já pronto por cima — assim
+    // não sobra nenhuma margem branca, só o gramado ao redor.
+    var PAGINA_W = 1240, PAGINA_H = 1754; // proporção A4 (210 x 297mm)
+    var MARGEM = 40;
+
+    var canvasPagina = document.createElement("canvas");
+    canvasPagina.width = PAGINA_W;
+    canvasPagina.height = PAGINA_H;
+    var ctxPagina = canvasPagina.getContext("2d");
+    desenharCampoFundo(ctxPagina, PAGINA_W, PAGINA_H);
+
+    var larguraMax = PAGINA_W - MARGEM * 2;
+    var alturaMax = PAGINA_H - MARGEM * 2;
+    var proporcao = canvasConteudo.width / canvasConteudo.height;
 
     var largura = larguraMax;
     var altura = largura / proporcao;
@@ -717,9 +727,15 @@ function gerarPdfDaPagina() {
       largura = altura * proporcao;
     }
 
-    var x = (pdf.internal.pageSize.getWidth() - largura) / 2;
-    var y = (pdf.internal.pageSize.getHeight() - altura) / 2;
-    pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, largura, altura);
+    var x = (PAGINA_W - largura) / 2;
+    var y = (PAGINA_H - altura) / 2;
+    ctxPagina.drawImage(canvasConteudo, x, y, largura, altura);
+
+    var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    pdf.addImage(
+      canvasPagina.toDataURL("image/jpeg", 0.92), "JPEG",
+      0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight()
+    );
     pdf.save("album-" + slugify(country.nome) + ".pdf");
   });
 }
