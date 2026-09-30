@@ -704,12 +704,22 @@ function gerarPdfDaPagina() {
   if (!pagina || !country) return Promise.reject(new Error("Nenhuma seleção carregada"));
 
   return gerarImagemSelecao(pagina, country).then(function (canvas) {
-    var pdf = new window.jspdf.jsPDF({
-      unit: "px",
-      format: [canvas.width, canvas.height],
-      hotfixes: ["px_scaling"]
-    });
-    pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, canvas.width, canvas.height);
+    var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    var margem = 8;
+    var larguraMax = pdf.internal.pageSize.getWidth() - margem * 2;
+    var alturaMax = pdf.internal.pageSize.getHeight() - margem * 2;
+    var proporcao = canvas.width / canvas.height;
+
+    var largura = larguraMax;
+    var altura = largura / proporcao;
+    if (altura > alturaMax) {
+      altura = alturaMax;
+      largura = altura * proporcao;
+    }
+
+    var x = (pdf.internal.pageSize.getWidth() - largura) / 2;
+    var y = (pdf.internal.pageSize.getHeight() - altura) / 2;
+    pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, largura, altura);
     pdf.save("album-" + slugify(country.nome) + ".pdf");
   });
 }
