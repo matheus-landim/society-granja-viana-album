@@ -262,7 +262,7 @@ function criarCardFigurinha(fig, countryId, countryNome) {
     "</div>" +
     '<div class="figurinha-info">' +
       '<span class="figurinha-numero-tag">Nº ' + escapeAttr(fig.numero) + "</span>" +
-      '<input class="figurinha-nome" placeholder="Nome do jogador" value="' + escapeAttr(fig.nome) + '" ' + (logado ? "" : "readonly") + ">" +
+      '<input class="figurinha-nome" placeholder="' + (logado ? "Nome do jogador" : "") + '" value="' + escapeAttr(fig.nome) + '" ' + (logado ? "" : "readonly") + ">" +
       (logado
         ? '<input class="figurinha-numero-input somente-edicao" placeholder="Nº da camisa" maxlength="3" value="' + escapeAttr(fig.numero) + '">'
         : "") +
@@ -338,13 +338,9 @@ function renderGrid(pagina, countryId, countryNome) {
   grid.innerHTML = "";
   var logado = !!currentUser;
 
-  // Pra quem não está logado, esconde as figurinhas ainda sem jogador
-  // (sem nome nem foto). Quem está logado vê tudo, pra poder completar.
-  var visiveis = logado
-    ? pagina.figurinhas
-    : pagina.figurinhas.filter(function (fig) { return fig.nome || fig.fotoUrl; });
-
-  visiveis.forEach(function (fig) {
+  // Mostra sempre as 11 figurinhas do time, mesmo as que ainda não têm
+  // nome/foto cadastrados — ninguém pode ficar de fora do álbum.
+  pagina.figurinhas.forEach(function (fig) {
     grid.appendChild(criarCardFigurinha(fig, countryId, countryNome));
   });
 
