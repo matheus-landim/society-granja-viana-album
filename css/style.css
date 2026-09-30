@@ -806,14 +806,6 @@ img { max-width: 100%; display: block; }
 body.logado .somente-edicao { display: inline-flex; }
 body.logado .figurinha-baixar-dica { display: none; }
 
-/* Enquanto capturamos a imagem (html2canvas, pro "Baixar PDF da página" ou
-   pro card do Instagram), escondemos os controles de edição e o brilho
-   holográfico — o mix-blend-mode dele não é suportado pelo html2canvas e
-   sai como uma mancha colorida errada em vez do brilho sutil da tela. */
-body.capturando .somente-edicao,
-body.capturando .seta { visibility: hidden; }
-body.capturando .figurinha-card::after { display: none; }
-
 /* ---------- Login modal ---------- */
 .login-modal {
   border: none;
@@ -1032,8 +1024,7 @@ a.patrocinador-item:hover { transform: translateY(-2px); border-color: var(--acc
   .figurinha-card::after { animation: none; }
 }
 
-/* O PDF da página (botão "Baixar PDF da página") não usa mais o
-   "@media print" do navegador — ele tirava fotos e jogadores em
-   navegadores reais de formas imprevisíveis. Agora o PDF é gerado a
-   partir de uma captura (html2canvas) do que já está certo na tela,
-   ver gerarPdfDaPagina() em js/app.js. */
+/* O PDF da página (botão "Baixar PDF da página") não usa o "@media print"
+   do navegador nem captura a página — ele é desenhado do zero num canvas
+   (fundo do campo, escudo, patrocinador, foto do time e as figurinhas),
+   ver gerarImagemSelecao() em js/app.js. */

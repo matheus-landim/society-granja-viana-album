@@ -449,56 +449,258 @@ function aguardarFotosCarregarem(container) {
   return Promise.race([Promise.all(promessas), tempoLimite]);
 }
 
-// Gera o PDF a partir do que já está certo na tela (html2canvas + jsPDF),
-// em vez de depender do modo de impressão do navegador: o "@media print"
-// se comportava de formas diferentes — às vezes cortado, às vezes com
-// fotos faltando — em navegadores reais, mesmo depois de testado.
-var CLASSES_OCULTAS_NO_PDF = [
-  "pagina-acoes", "seta", "grid-dica", "somente-edicao",
-  "figurinha-baixar-dica", "patrocinador-instagram"
-];
+// Gera o PDF desenhando tudo do zero num canvas (fundo do campo, escudo,
+// patrocinador, foto do time e as figurinhas de todos os jogadores), em
+// vez de tentar capturar/imprimir a própria página — as duas abordagens
+// anteriores (impressão do navegador, depois html2canvas) saíam cortadas
+// ou incompletas em navegadores reais. Desenhando eu mesmo, o tamanho do
+// canvas é sempre calculado pra caber tudo, sem cortar nada.
+
+// Carrega com onload/onerror (não com img.decode(), que trava quando várias
+// chamadas acontecem em paralelo em alguns navegadores) e nunca rejeita —
+// se der erro ou vier vazia, cai no ícone padrão, pra nunca travar o PDF
+// por causa de uma foto só.
+function carregarImagemPdf(url) {
+  return new Promise(function (resolve) {
+    if (!url) {
+      var placeholder = new Image();
+      placeholder.onload = function () { resolve(placeholder); };
+      placeholder.src = placeholderSVG;
+      return;
+    }
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = function () { resolve(img.naturalWidth ? img : carregarImagemPdf(null)); };
+    img.onerror = function () { resolve(carregarImagemPdf(null)); };
+    img.src = url;
+  });
+}
+
+function desenharRetanguloArredondado(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function desenharCampoFundo(ctx, w, h) {
+  var faixa = 64;
+  for (var x = 0; x < w; x += faixa * 2) {
+    ctx.fillStyle = "#2e8b3d";
+    ctx.fillRect(x, 0, faixa, h);
+    ctx.fillStyle = "#327f38";
+    ctx.fillRect(x + faixa, 0, faixa, h);
+  }
+}
+
+function truncarTexto(ctx, texto, larguraMax) {
+  if (ctx.measureText(texto).width <= larguraMax) return texto;
+  var t = texto;
+  while (t.length > 1 && ctx.measureText(t + "…").width > larguraMax) {
+    t = t.slice(0, -1);
+  }
+  return t + "…";
+}
+
+function gerarImagemSelecao(pagina, country) {
+  var W = 1200;
+  var MARGEM = 70;
+  var CONTENT_W = W - MARGEM * 2;
+  var TOPO = 55;
+  var RODAPE = 55;
+  var ESPACO_SECAO = 45;
+  var HEADER_H = 250;
+  var COLS = 4;
+  var GAP = 26;
+  var CARD_W = (CONTENT_W - (COLS - 1) * GAP) / COLS;
+  var CARD_FOTO_H = CARD_W * 1.12;
+  var CARD_INFO_H = 100;
+  var CARD_H = CARD_FOTO_H + CARD_INFO_H;
+
+  var figurinhas = pagina.figurinhas || [];
+  var linhas = Math.max(1, Math.ceil(figurinhas.length / COLS));
+  var GRID_H = linhas * CARD_H + (linhas - 1) * GAP;
+
+  var promessas = {
+    bandeira: carregarImagemPdf(bandeiraUrl(country)),
+    patrocinadorLogo: pagina.patrocinador && pagina.patrocinador.logoUrl
+      ? carregarImagemPdf(pagina.patrocinador.logoUrl)
+      : Promise.resolve(null),
+    fotoTime: pagina.capaUrl ? carregarImagemPdf(pagina.capaUrl) : Promise.resolve(null),
+    fotosJogadores: Promise.all(figurinhas.map(function (fig) {
+      return carregarImagemPdf(fig.fotoUrl);
+    }))
+  };
+  var chaves = Object.keys(promessas);
+
+  return Promise.all(chaves.map(function (k) { return promessas[k]; })).then(function (resultados) {
+    var imagens = {};
+    chaves.forEach(function (k, i) { imagens[k] = resultados[i]; });
+
+    var alturaFotoTime = 0;
+    var larguraFotoTime = 0;
+    if (imagens.fotoTime) {
+      var proporcaoFoto = imagens.fotoTime.naturalWidth / imagens.fotoTime.naturalHeight;
+      larguraFotoTime = CONTENT_W * 0.62;
+      alturaFotoTime = larguraFotoTime / proporcaoFoto;
+      var ALTURA_MAX_FOTO = 520;
+      if (alturaFotoTime > ALTURA_MAX_FOTO) {
+        alturaFotoTime = ALTURA_MAX_FOTO;
+        larguraFotoTime = alturaFotoTime * proporcaoFoto;
+      }
+    }
+
+    var SPONSOR_H = pagina.patrocinador ? 210 : 0;
+
+    var alturaTotal = TOPO + HEADER_H;
+    if (pagina.patrocinador) alturaTotal += ESPACO_SECAO + SPONSOR_H;
+    if (imagens.fotoTime) alturaTotal += ESPACO_SECAO + alturaFotoTime + 12;
+    alturaTotal += ESPACO_SECAO + GRID_H + RODAPE;
+
+    var canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = Math.round(alturaTotal);
+    var ctx = canvas.getContext("2d");
+
+    desenharCampoFundo(ctx, canvas.width, canvas.height);
+
+    var cursorY = TOPO;
+
+    // Cabeçalho: nome da escola, nome da seleção e escudo/bandeira
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.font = "700 22px Poppins, sans-serif";
+    ctx.fillText("SOCIETY GRANJA VIANA · CAMPEONATO INTERNO", W / 2, cursorY + 24);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 74px 'Bebas Neue', Poppins, sans-serif";
+    ctx.fillText((country.nome || "").toUpperCase(), W / 2, cursorY + 105);
+
+    var bandeiraW = 130, bandeiraH = 97;
+    var bandeiraX = W / 2 - bandeiraW / 2;
+    var bandeiraY = cursorY + 130;
+    desenharRetanguloArredondado(ctx, bandeiraX - 6, bandeiraY - 6, bandeiraW + 12, bandeiraH + 12, 14);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.save();
+    desenharRetanguloArredondado(ctx, bandeiraX, bandeiraY, bandeiraW, bandeiraH, 10);
+    ctx.clip();
+    desenharImagemContain(ctx, imagens.bandeira, bandeiraX, bandeiraY, bandeiraW, bandeiraH);
+    ctx.restore();
+
+    cursorY += HEADER_H;
+
+    // Patrocinador
+    if (pagina.patrocinador) {
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.font = "700 24px Poppins, sans-serif";
+      ctx.fillText("PATROCINADOR DA SELEÇÃO", W / 2, cursorY + 24);
+
+      var pBoxW = 400, pBoxH = SPONSOR_H - 40;
+      var pBoxX = W / 2 - pBoxW / 2, pBoxY = cursorY + 44;
+      desenharRetanguloArredondado(ctx, pBoxX, pBoxY, pBoxW, pBoxH, 18);
+      ctx.fillStyle = "#fffdf6";
+      ctx.fill();
+      ctx.strokeStyle = "#ddd0a0";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      if (imagens.patrocinadorLogo) {
+        desenharImagemContain(ctx, imagens.patrocinadorLogo, pBoxX + 24, pBoxY + 14, pBoxW - 48, pBoxH - 66);
+      }
+      ctx.fillStyle = "#101a12";
+      ctx.font = "700 26px Poppins, sans-serif";
+      ctx.fillText(truncarTexto(ctx, pagina.patrocinador.nome || "", pBoxW - 32), W / 2, pBoxY + pBoxH - 22);
+
+      cursorY += ESPACO_SECAO + SPONSOR_H;
+    }
+
+    // Foto do time
+    if (imagens.fotoTime) {
+      var fotoX = W / 2 - larguraFotoTime / 2;
+      var fotoY = cursorY;
+      desenharRetanguloArredondado(ctx, fotoX - 6, fotoY - 6, larguraFotoTime + 12, alturaFotoTime + 12, 16);
+      ctx.fillStyle = "#fffdf6";
+      ctx.fill();
+      ctx.save();
+      desenharRetanguloArredondado(ctx, fotoX, fotoY, larguraFotoTime, alturaFotoTime, 12);
+      ctx.clip();
+      ctx.fillStyle = "#cccccc";
+      ctx.fillRect(fotoX, fotoY, larguraFotoTime, alturaFotoTime);
+      desenharImagemContain(ctx, imagens.fotoTime, fotoX, fotoY, larguraFotoTime, alturaFotoTime);
+      var legendaH = 46;
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(fotoX, fotoY + alturaFotoTime - legendaH, larguraFotoTime, legendaH);
+      ctx.restore();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "700 24px Poppins, sans-serif";
+      ctx.fillText(country.nome || "", W / 2, fotoY + alturaFotoTime - legendaH / 2 + 8);
+
+      cursorY += alturaFotoTime + 12 + ESPACO_SECAO;
+    }
+
+    // Grade com todos os jogadores
+    figurinhas.forEach(function (fig, i) {
+      var col = i % COLS, row = Math.floor(i / COLS);
+      var cx = MARGEM + col * (CARD_W + GAP);
+      var cy = cursorY + row * (CARD_H + GAP);
+
+      desenharRetanguloArredondado(ctx, cx, cy, CARD_W, CARD_H, 14);
+      ctx.fillStyle = "#fffdf6";
+      ctx.fill();
+      ctx.strokeStyle = "#ddd0a0";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.save();
+      desenharRetanguloArredondado(ctx, cx, cy, CARD_W, CARD_FOTO_H, 11);
+      ctx.clip();
+      ctx.fillStyle = "#e7e7ef";
+      ctx.fillRect(cx, cy, CARD_W, CARD_FOTO_H);
+      desenharImagemContain(ctx, imagens.fotosJogadores[i], cx, cy, CARD_W, CARD_FOTO_H);
+      ctx.restore();
+
+      var tagW = 92, tagH = 36;
+      var tagX = cx + CARD_W / 2 - tagW / 2;
+      var tagY = cy + CARD_FOTO_H + 12;
+      desenharRetanguloArredondado(ctx, tagX, tagY, tagW, tagH, 18);
+      ctx.fillStyle = "#f2c14e";
+      ctx.fill();
+      ctx.fillStyle = "#101a12";
+      ctx.font = "700 20px Poppins, sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Nº " + (fig.numero || ""), tagX + tagW / 2, tagY + tagH / 2 + 1);
+      ctx.textBaseline = "alphabetic";
+
+      if (fig.nome) {
+        ctx.fillStyle = "#101a12";
+        ctx.font = "700 20px Poppins, sans-serif";
+        var nomeTexto = truncarTexto(ctx, fig.nome.toUpperCase(), CARD_W - 20);
+        ctx.fillText(nomeTexto, cx + CARD_W / 2, tagY + tagH + 26);
+      }
+    });
+
+    return canvas;
+  });
+}
 
 function gerarPdfDaPagina() {
-  var pagina = document.getElementById("pagina");
+  var pagina = window.paginaAtual;
+  var country = pagina && getCountry(pagina.countryId);
+  if (!pagina || !country) return Promise.reject(new Error("Nenhuma seleção carregada"));
 
-  return aguardarFotosCarregarem(pagina)
-    .then(function () {
-      document.body.classList.add("capturando");
-      return html2canvas(pagina, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#fbf3d9",
-        ignoreElements: function (el) {
-          return !!(el.classList && CLASSES_OCULTAS_NO_PDF.some(function (classe) {
-            return el.classList.contains(classe);
-          }));
-        }
-      });
-    })
-    .then(function (canvas) {
-      document.body.classList.remove("capturando");
-      var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
-      var margem = 8;
-      var larguraPagina = pdf.internal.pageSize.getWidth();
-      var alturaPagina = pdf.internal.pageSize.getHeight();
-      var larguraMax = larguraPagina - margem * 2;
-      var alturaMax = alturaPagina - margem * 2;
-      var proporcao = canvas.width / canvas.height;
-
-      var largura = larguraMax;
-      var altura = largura / proporcao;
-      if (altura > alturaMax) {
-        altura = alturaMax;
-        largura = altura * proporcao;
-      }
-
-      var x = (larguraPagina - largura) / 2;
-      var y = margem;
-      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, largura, altura);
-
-      var titulo = (document.getElementById("pagina-titulo").textContent || "selecao").trim();
-      pdf.save("album-" + slugify(titulo) + ".pdf");
+  return gerarImagemSelecao(pagina, country).then(function (canvas) {
+    var pdf = new window.jspdf.jsPDF({
+      unit: "px",
+      format: [canvas.width, canvas.height],
+      hotfixes: ["px_scaling"]
     });
+    pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, canvas.width, canvas.height);
+    pdf.save("album-" + slugify(country.nome) + ".pdf");
+  });
 }
 
 function initEventosPagina() {
@@ -513,7 +715,6 @@ function initEventosPagina() {
         alert("Não foi possível gerar o PDF agora. Tente novamente.");
       })
       .then(function () {
-        document.body.classList.remove("capturando");
         botao.disabled = false;
         botao.textContent = textoOriginal;
       });
