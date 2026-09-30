@@ -449,17 +449,74 @@ function aguardarFotosCarregarem(container) {
   return Promise.race([Promise.all(promessas), tempoLimite]);
 }
 
+// Gera o PDF a partir do que já está certo na tela (html2canvas + jsPDF),
+// em vez de depender do modo de impressão do navegador: o "@media print"
+// se comportava de formas diferentes — às vezes cortado, às vezes com
+// fotos faltando — em navegadores reais, mesmo depois de testado.
+var CLASSES_OCULTAS_NO_PDF = [
+  "pagina-acoes", "seta", "grid-dica", "somente-edicao",
+  "figurinha-baixar-dica", "patrocinador-instagram"
+];
+
+function gerarPdfDaPagina() {
+  var pagina = document.getElementById("pagina");
+
+  return aguardarFotosCarregarem(pagina)
+    .then(function () {
+      document.body.classList.add("capturando");
+      return html2canvas(pagina, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#fbf3d9",
+        ignoreElements: function (el) {
+          return !!(el.classList && CLASSES_OCULTAS_NO_PDF.some(function (classe) {
+            return el.classList.contains(classe);
+          }));
+        }
+      });
+    })
+    .then(function (canvas) {
+      document.body.classList.remove("capturando");
+      var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+      var margem = 8;
+      var larguraPagina = pdf.internal.pageSize.getWidth();
+      var alturaPagina = pdf.internal.pageSize.getHeight();
+      var larguraMax = larguraPagina - margem * 2;
+      var alturaMax = alturaPagina - margem * 2;
+      var proporcao = canvas.width / canvas.height;
+
+      var largura = larguraMax;
+      var altura = largura / proporcao;
+      if (altura > alturaMax) {
+        altura = alturaMax;
+        largura = altura * proporcao;
+      }
+
+      var x = (larguraPagina - largura) / 2;
+      var y = margem;
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, largura, altura);
+
+      var titulo = (document.getElementById("pagina-titulo").textContent || "selecao").trim();
+      pdf.save("album-" + slugify(titulo) + ".pdf");
+    });
+}
+
 function initEventosPagina() {
   document.getElementById("btn-baixar-pdf").addEventListener("click", function () {
     var botao = this;
     var textoOriginal = botao.textContent;
     botao.disabled = true;
-    botao.textContent = "Preparando PDF…";
-    aguardarFotosCarregarem(document.getElementById("pagina")).then(function () {
-      window.print();
-      botao.disabled = false;
-      botao.textContent = textoOriginal;
-    });
+    botao.textContent = "Gerando PDF…";
+    gerarPdfDaPagina()
+      .catch(function (erro) {
+        console.error("Não consegui gerar o PDF da página:", erro);
+        alert("Não foi possível gerar o PDF agora. Tente novamente.");
+      })
+      .then(function () {
+        document.body.classList.remove("capturando");
+        botao.disabled = false;
+        botao.textContent = textoOriginal;
+      });
   });
 
   document.getElementById("btn-momentos").addEventListener("click", function () {
