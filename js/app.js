@@ -338,9 +338,15 @@ function renderGrid(pagina, countryId, countryNome) {
   grid.innerHTML = "";
   var logado = !!currentUser;
 
-  // Mostra sempre as 11 figurinhas do time, mesmo as que ainda não têm
-  // nome/foto cadastrados — ninguém pode ficar de fora do álbum.
-  pagina.figurinhas.forEach(function (fig) {
+  // Pra quem não está logado, esconde as figurinhas que não são de
+  // ninguém (sem nome e sem foto) — são só posições do time que ainda
+  // não têm jogador cadastrado, não é gente que "sumiu" do álbum. Quem
+  // está logado vê tudo, pra poder completar essas posições.
+  var visiveis = logado
+    ? pagina.figurinhas
+    : pagina.figurinhas.filter(function (fig) { return fig.nome || fig.fotoUrl; });
+
+  visiveis.forEach(function (fig) {
     grid.appendChild(criarCardFigurinha(fig, countryId, countryNome));
   });
 
@@ -520,9 +526,14 @@ function gerarImagemSelecao(pagina, country) {
   var CARD_INFO_H = 100;
   var CARD_H = CARD_FOTO_H + CARD_INFO_H;
 
-  var figurinhas = pagina.figurinhas || [];
-  var linhas = Math.max(1, Math.ceil(figurinhas.length / COLS));
-  var GRID_H = linhas * CARD_H + (linhas - 1) * GAP;
+  // Só entram no PDF os jogadores de verdade (com nome ou foto) — uma
+  // posição do time ainda sem ninguém não deve aparecer como se fosse
+  // um aluno "sem rosto e sem nome".
+  var figurinhas = (pagina.figurinhas || []).filter(function (fig) {
+    return fig.nome || fig.fotoUrl;
+  });
+  var linhas = Math.ceil(figurinhas.length / COLS);
+  var GRID_H = linhas > 0 ? linhas * CARD_H + (linhas - 1) * GAP : 0;
 
   var promessas = {
     bandeira: carregarImagemPdf(bandeiraUrl(country)),
